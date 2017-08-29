@@ -76,5 +76,8 @@ CREATE TABLE change (
   time TIMESTAMP NOT NULL,
   member INTEGER REFERENCES member(id) NOT NULL,
   relname NAME REFERENCES pg_class(relname) NOT NULL,
-  record integer REFERENCES
+  row integer NOT NULL,
+  column NAME REFERENCES pg_attribute(attname) NOT NULL,
+  old TEXT NOT NULL,
+  new TEXT NOT NULL
 );
