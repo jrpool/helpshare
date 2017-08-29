@@ -132,7 +132,11 @@ The developers may consider these possible future extensions in their design of 
 
 The above requirements are modeled with 12 interrelated objects. A summary of the main objects and their relationships is shown in this diagram:
 
-<img src='summary.png' alt='relationships among members, skills, requests, and help'>
+<img src='summary.png' alt='members need skills, make help requests, and answer help requests'>
+
+The model is implemented with a database, in which each of the 12 objects is represented by a table. The schema is shown in this diagram:
+
+<img src='helpshare.png' alt='entity-relationship diagram for database'>
 
 ### Project Origin
 
