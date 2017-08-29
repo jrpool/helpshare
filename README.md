@@ -24,17 +24,19 @@ Members currently record their skill acquisitions in a central database and have
 
 We want a web application that facilitates the giving and receiving of help in this situation. In the first trial version of the application, we want it to make the following things true:
 
-0. Members with status “manager” can add, delete, amend, and reclassify members.
+0. Members with status “manager” can add, amend, and reclassify members, phases, statuses, locations, and ratings. In lieu of deletion, these can be reclassified as obsolete.
 
-1. Members with status “expert” can add, delete, amend, and reclassify skills.
+1. Members with status “expert” can add, amend, and reclassify skills and domains. In lieu of deletion, a skill or domain can be reclassified as obsolete.
 
-2. Any member wanting help with a skill can open a request. Because the site is large enough to interfere with a helper finding a requester, the request specifies where on the site the requester is located. The request optionally also includes a comment. The request remains open until terminated. Its maker can amend its location and/or its comment, or terminate it, while it is open.
+2. Members can declare themselves to have mastered skills.
 
-3. Any member other than the maker of a request can make a help offer for an open request. The offer remains open until terminated. Its maker can terminate it. If an open request is terminated, all open offers for it are automatically terminated.
+3. Any member wanting help with a skill can open a request. Because the site is large enough to interfere with a helper finding a requester, the request specifies where on the site the requester is located. The request optionally also includes a comment. The request remains open until terminated. Its maker can amend its location and/or its comment, or terminate it, while it is open.
 
-4. The member who has made a request and each member who has made a help offer for the request can create an assessment for the request. The assessment has a type and an optional comment.
+4. Any member other than the maker of a request can make a help offer for an open request. The offer remains open until terminated. Its maker can terminate it. If an open request is terminated, all open offers for it are automatically terminated.
 
-5. All members can see the following facts:
+5. The member who has made a request and each member who has made a help offer for the request can create an assessment for the request. The assessment has a type and an optional comment.
+
+6. All members can see the following facts:
 
 ```
 I. ENTITIES
@@ -116,6 +118,7 @@ Reports that members would likely want, combining and summarizing the above fact
 We envision that subsequent versions will include additional features. Some features likely to be subsequently required are:
 
 ```
+- Authentication.
 - Notifications to potential helpers.
 - Suspension of requests during times when requesters are unavailable.
 - Classification of members into on-call and regular statuses.
