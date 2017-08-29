@@ -12,90 +12,127 @@ Database-backed web application demonstrating cooperative help management.
 
 This application addresses the following imaginary requirements:
 
-Our on-site community has about 100 members in various categories. Members are, from time to time, reassigned to different categories. Members seek to acquire most or all of a list of about 400 listed skills, which also are assigned to various categories. Members pursue the skills in different sequences and at different paces. By design, all members both learn and help others learn. At any time, when a member experiences difficulty acquiring a skill, other members who have that skill are expected to help.
+Our on-site community has about 100 members, each classified as to (1) phase and (2) status.
+
+Members seek to acquire most or all of a list of about 400 listed skills, which are classified as to domain.
+
+Members pursue the skills in different sequences and at different paces. By design, all members both learn and help others learn. At any time, when a member experiences difficulty acquiring a skill, other members who have that skill are expected to help.
 
 One of the obstacles to the exchange of help is a lack of coordination and transparency. Imagine that you are a learner wanting help with skill 328. How should you request it? Should you broadcast your request or direct it to a specific potential helper? If the former, won’t the community experience intolerable message traffic? If the latter, to whom? How can you know which other members already have that skill? How will a potential helper know whether another member has already agreed to help you? How will your request be retired when resolved?
 
-Members currently record their skill acquisitions in a central database, but have access only to their own skill records.
+Members currently record their skill acquisitions in a central database and have access only to their own skill records.
 
 We want a web application that facilitates the giving and receiving of help in this situation. In the first trial version of the application, we want it to make the following things true:
 
-1. Any member wanting help with a skill can open a request.
+0. Members with status “manager” can add, delete, amend, and reclassify members.
 
-2. All members can see the following facts:
+1. Members with status “expert” can add, delete, amend, and reclassify skills.
 
+2. Any member wanting help with a skill can open a request. Because the site is large enough to interfere with a helper finding a requester, the request specifies where on the site the requester is located. The request optionally also includes a comment. The request remains open until terminated. Its maker can amend its location and/or its comment, or terminate it, while it is open.
+
+3. Any member other than the maker of a request can make a help offer for an open request. The offer remains open until terminated. Its maker can terminate it. If an open request is terminated, all open offers for it are automatically terminated.
+
+4. The member who has made a request and each member who has made a help offer for the request can create an assessment for the request. The assessment has a type and an optional comment.
+
+5. All members can see the following facts:
+
+```
 I. ENTITIES
 
 A. Members:
 a. ID.
 b. Name.
 c. Handle.
-d. Category.
-e. Date of entry into current category.
-f. Skills acquired.
+d. Phase.
+e. Status.
 
-B. Skills:
+B. Phases:
 a. ID.
-b. Category.
+b. Description.
+
+C. Statuses:
+a. ID.
+b. Description.
+
+D. Skills:
+a. ID.
+b. Domain.
 c. Description.
 
-C. Member categories:
+E. Domains:
 a. ID.
 b. Description.
 
-D. Skill categories:
+F. Masteries:
+a. ID.
+b. Member.
+c. Skill.
+
+G. Locations:
 a. ID.
 b. Description.
 
-E. Locations:
-a. ID.
-b. Description.
-
-F. Disposition types:
+H. Ratings:
 a. ID.
 b. Description.
 
 II. EVENTS
 
-A. Help requests:
+A. Requests:
 a. ID.
-b. Member.
-c. Member category when request made.
-d. Member location on site when request made.
-e. Date and time request made.
-f. Skill.
+b. Skill.
+c. Date and time.
+d. Member.
+e. Location.
+f. Comment.
 
-B. Help offers:
+B. Offers:
 a. ID.
 b. Request.
 c. Maker.
-d. Date and time of offer.
-e. Date and time of withdrawal (if any).
+d. Date and time.
 
-C. Request dispositions:
+C. Assessments:
 a. ID.
 b. Request.
 c. Reporter.
-d. Disposition type.
+d. Rating.
+e. Comment.
+
+D. Changes:
+a. ID.
+b. Date and time.
+c. Maker.
+d. Thing changed.
+e. Property changed.
+f. Old value.
+g. New value.
 
 III. INTEGRATIONS
 
 Reports that members would likely want, combining and summarizing the above facts.
+```
 
-3. Any member can make a help request. Any member other than the maker of a request can make a help offer in response to a request. The maker of a not-withdrawn request or any maker of an offer in response to that request can report a request disposition. One request, offer, or report does not preclude another.
-
-We envision subsequent versions that will include additional features. Some features likely to be subsequently required are:
+We envision that subsequent versions will include additional features. Some features likely to be subsequently required are:
 
 ```
 - Notifications to potential helpers.
 - Suspension of requests during times when requesters are unavailable.
 - Classification of members into on-call and regular statuses.
-- Assignments of particular requests to on-call members.
+- Assignments of helping duties for particular requests to on-call members.
 - Addition of modules (study units) as entities, with associated skills.
 - Addition of member groups as entities capable of making help requests.
+- Automatic termination of requests determined to be stale.
+- Status-based limitations of visibilities of some facts and changes.
 ```
 
 The developers may consider these possible future extensions in their design of the initial version.
+
+## Implementation
+
+The above requirements are modeled with 12 interrelated objects. A summary of the main objects and their relationships is shown in this diagram:
+
+<img src='summary.png' alt='relationships among members, skills, requests, and help'>
 
 ### Project Origin
 
