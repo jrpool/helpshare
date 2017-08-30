@@ -22,7 +22,7 @@ One of the obstacles to the exchange of help is a lack of coordination and trans
 
 Members currently record their skill acquisitions in a central database and have access only to their own skill records.
 
-We want a web application that facilitates the giving and receiving of help in this situation. In the first trial version of the application, we want it to make the following things true:
+We want an API that facilitates the giving and receiving of help in this situation. In the first trial version of the API, we want it to make the following things true:
 
 0. Members with status “manager” can add, amend, and reclassify members, phases, statuses, locations, and ratings. In lieu of deletion, these can be reclassified as obsolete.
 
@@ -83,16 +83,18 @@ II. EVENTS
 A. Requests:
 a. ID.
 b. Skill.
-c. Date and time.
-d. Member.
-e. Location.
-f. Comment.
+c. Member.
+d. Location.
+e. Comment.
+f. When made.
+g. When terminated.
 
 B. Offers:
 a. ID.
 b. Request.
 c. Maker.
-d. Date and time.
+d. When made.
+e. When terminated.
 
 C. Assessments:
 a. ID.
@@ -114,6 +116,8 @@ III. INTEGRATIONS
 
 Reports that members would likely want, combining and summarizing the above facts.
 ```
+
+7. The API trusts the source of all queries to be an agent that is authorized to access the API on behalf of a member. Each query identifies that member.
 
 We envision that subsequent versions will include additional features. Some features likely to be subsequently required are:
 
