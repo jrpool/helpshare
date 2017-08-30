@@ -1,7 +1,33 @@
+const db = require('./db').db;
 
-DROP TABLE IF EXISTS
-  assessment, change, domain, location, mastery, member,
-  offer, phase, rating, request, skill, status;
+const installSchema = schema => {
+  const queries = [];
+  for (const table in schema.tables) {
+    queries.push(`DROP TABLE IF EXISTS ${table}`);
+    const queryCols = [];
+    for (const col in schema.tables[table]) {
+      queryCols.push(
+        col + col.type
+        + (col.pk ? ' PRIMARY KEY' : '')
+        + (col.unique ? ' UNIQUE' : '')
+        + (col.fk ? ' REFERENCES ' + col.fk : '')
+        + (col.nn ? ' NOT NULL' : '')
+      );
+    }
+    queries.push(`CREATE TABLE ${table} (${queryCols.join(', ')})`);
+  }
+  db.task(context => {
+    const promises = [];
+    for (const query of queries) {
+      promises.push(context.none(query));
+    }
+    Promise.all(promises)
+    .then(() => {
+      console.log('Schema installed.');
+    })
+    .catch(error => error);
+  });
+};
 
 const schema = {
   tables: {
@@ -67,7 +93,7 @@ const schema = {
       },
       domain: {
         type: 'INTEGER',
-        fk: domain(id),
+        fk: 'domain(id)',
         nn: true
       },
       description: {
@@ -92,12 +118,12 @@ const schema = {
       },
       phase: {
         type: 'INTEGER',
-        fk: phase(id),
+        fk: 'phase(id)',
         nn: true
       },
       status: {
         type: 'INTEGER',
-        fk: status(id),
+        fk: 'status(id)',
         nn: true
       }
     },
@@ -108,12 +134,12 @@ const schema = {
       },
       member: {
         type: 'INTEGER',
-        fk: member(id),
+        fk: 'member(id)',
         nn: true
       },
       skill: {
         type: 'INTEGER',
-        fk: skill(id),
+        fk: 'skill(id)',
         nn: true
       }
     },
@@ -124,17 +150,17 @@ const schema = {
       },
       skill: {
         type: 'INTEGER',
-        fk: skill(id),
+        fk: 'skill(id)',
         nn: true
       },
       member: {
         type: 'INTEGER',
-        fk: member(id),
+        fk: 'member(id)',
         nn: true
       },
       location: {
         type: 'INTEGER',
-        fk: location(id),
+        fk: 'location(id)',
         nn: true
       },
       comment: {
@@ -156,12 +182,12 @@ const schema = {
       },
       request: {
         type: 'INTEGER',
-        fk: request(id),
+        fk: 'request(id)',
         nn: true
       },
       member: {
         type: 'INTEGER',
-        fk: member(id),
+        fk: 'member(id)',
         nn: true
       },
       started: {
@@ -180,21 +206,21 @@ const schema = {
       },
       request: {
         type: 'INTEGER',
-        fk: request(id),
+        fk: 'request(id)',
         nn: true
       },
       member: {
         type: 'INTEGER',
-        fk: member(id),
+        fk: 'member(id)',
         nn: true
       },
       rating: {
         type: 'INTEGER',
-        fk: rating(id),
+        fk: 'rating(id)',
         nn: true
       },
       comment: {
-        type: TEXT
+        type: 'TEXT'
       }
     },
     change: {
@@ -208,12 +234,12 @@ const schema = {
       },
       member: {
         type: 'INTEGER',
-        fk: member(id),
+        fk: 'member(id)',
         nn: true
       },
       relname: {
         type: 'NAME',
-        fk: pg_class(relname),
+        fk: 'pg_class(relname)',
         nn: true
       },
       row: {
@@ -222,7 +248,7 @@ const schema = {
       },
       column: {
         type: 'NAME',
-        fk: pg_attribute(attname),
+        fk: 'pg_attribute(attname)',
         nn: true
       },
       old: {
@@ -236,3 +262,7 @@ const schema = {
     }
   }
 };
+
+installSchema(schema);
+
+module.exports = {installSchema, schema};

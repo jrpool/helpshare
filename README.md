@@ -1,6 +1,6 @@
 # helpshare
 
-Database-backed web application demonstrating cooperative help management.
+Database-backed API supporting cooperative help management.
 
 ## Project Members
 
