@@ -4,10 +4,27 @@ const createMember = doer, member {
   db.getStatusName(doer)
   .then(statusName => {
     if (statusName === 'manager') {
-      db.none(`
-        INSERT INTO member (name, ) VALUES
-        ()
-        `)
+      db.none(
+        `
+          INSERT INTO member (fullname, handle, phase, status)
+          VALUES ($1, $2, $3, $4)
+        `, [
+          member.fullname,
+          member.handle,
+          member.phase,
+          member.status
+        ]
+      )
+      .then(() => {
+        db.none(
+          `
+            INSERT INTO change
+            (time, member, relname, row, column, old, new)
+            VALUES
+            (CURRENT_TIME, $1, member, )
+          `
+        )
+      })
     }
   })
   return db.query(`

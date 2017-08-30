@@ -35,7 +35,7 @@ CREATE TABLE skill (
 
 CREATE TABLE member (
   id SERIAL PRIMARY KEY,
-  name TEXT NOT NULL,
+  fullname TEXT NOT NULL,
   handle TEXT UNIQUE NOT NULL,
   phase INTEGER REFERENCES phase(id) NOT NULL,
   status INTEGER REFERENCES status(id) NOT NULL
