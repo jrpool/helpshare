@@ -2,11 +2,34 @@ const pgp = require('pg-promise')();
 const connectionString = process.env.DATABASE_URL;
 const db = pgp(connectionString);
 
-const getStatusName = function(memberID => {
+const getStatusName = memberID => {
   return db.oneOrNone(`
     SELECT status.description FROM member, status
     WHERE id = memberID AND status.id = member.status
     `);
 });
 
-module.exports = db;
+const logChange = (doer, relname, id, changes) => {
+  const lists = [];
+  for (change of changes) {
+    lists.push(`(
+      CURRENT_TIME, ${doer}, '${relname}', ${id},
+      '${change.colname}', '${change.old}', '${change.new}'
+    )`);
+  }
+  const query = `
+    INSERT INTO change (time, member, relname, row, colname, old, new)
+    VALUES ${lists.join(', ')}
+  `;
+  return db.none(query);
+};
+
+const logCreation = (doer, relname, id, object, colnames) => {
+  const changes = [];
+  for (colname of colnames) {
+    changes.push({colname: colname, old: null, new: object[colname});
+  }
+  return logChange(doer, relname, id, changes);
+}
+
+module.exports = {db, getStatusName, logChange};
