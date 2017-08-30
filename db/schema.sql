@@ -50,17 +50,19 @@ CREATE TABLE mastery (
 CREATE TABLE request (
   id SERIAL PRIMARY KEY,
   skill INTEGER REFERENCES skill(id) NOT NULL,
-  start TIMESTAMP NOT NULL,
   member INTEGER REFERENCES member(id) NOT NULL,
   location INTEGER REFERENCES location(id) NOT NULL,
-  comment TEXT
+  comment TEXT,
+  started TIMESTAMP NOT NULL,
+  ended TIMESTAMP NOT NULL
 );
 
 CREATE TABLE offer (
   id SERIAL PRIMARY KEY,
   request INTEGER REFERENCES request(id) NOT NULL,
   member INTEGER REFERENCES member(id) NOT NULL,
-  start TIMESTAMP NOT NULL
+  started TIMESTAMP NOT NULL,
+  ended TIMESTAMP NOT NULL
 );
 
 CREATE TABLE assessment (
