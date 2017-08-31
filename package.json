@@ -4,6 +4,7 @@
   "description": "Database-backed API supporting cooperative help management",
   "main": "src/server.js",
   "scripts": {
+    "db_drop": "dropdb --if-exists helpshare",
     "db_reset": "dropdb --if-exists helpshare && createdb helpshare",
     "schema_reset": "node db/schema",
     "lint": "eslint db/*.js && exit 0",
