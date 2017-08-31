@@ -337,6 +337,6 @@ const installSchema = () => {
 }
 
 // Execute the function on the schema.
-installSchema();
+// installSchema();
 
 module.exports = {installSchema, schema};
