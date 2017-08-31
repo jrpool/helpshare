@@ -5,9 +5,10 @@ const installSchema = schema => {
   const queries = [];
   const tableNames = Object.keys(schema.tables).reverse();
   for (const tableName of tableNames) {
+    queries.push(`DROP TABLE IF EXISTS ${tableName}`);
+  }
+  for (const tableName of tableNames.reverse()) {
     const table = schema.tables[tableName];
-    console.log('Table name is ' + tableName);
-    queries.push(`DROP TABLE IF EXISTS ${tableName} CASCADE`);
     const queryCols = [];
     for (const colName in table) {
       const col = table[colName];
@@ -20,6 +21,19 @@ const installSchema = schema => {
       );
     }
     queries.push(`CREATE TABLE ${tableName} (${queryCols.join(', ')})`);
+  }
+  for (const tableName of Object.keys(schema.comments.table)) {
+    queries.push(
+      `COMMENT ON TABLE ${tableName} IS '${schema.comments.table[tableName]}'`
+    );
+  }
+  for (const tableName of Object.keys(schema.comments.column)) {
+    for (const colName of Object.keys(schema.comments.column[tableName])) {
+      queries.push(
+        `COMMENT ON COLUMN ${tableName}.${colName} IS `
+        + `'${schema.comments.column[tableName][colName]}'`
+      );
+    }
   }
   db.tx(context => {
     const promises = [];
@@ -303,7 +317,7 @@ const schema = {
         member: 'member making the change',
         relname: 'name of the changed table',
         row: 'ID of the changed record',
-        colname: 'name of the changed column',
+        col: 'name of the changed column',
         old: 'value before the change (null if none)',
         new: 'value after the change (null if none)'
       }
