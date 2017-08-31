@@ -1,7 +1,8 @@
-const db = require('./db').db;
-
-// Define a function that installs a schema in the database.
-const installSchema = schema => {
+/*
+  Define a function that returns the queries to install a schema in
+  the database.
+*/
+const schemaQueries = schema => {
   const queries = [];
   const tableNames = Object.keys(schema.tables).reverse();
   for (const tableName of tableNames) {
@@ -35,6 +36,11 @@ const installSchema = schema => {
       );
     }
   }
+  return queries;
+};
+
+// Define a function that makes a set of queries to the database.
+const submitQueries = (db, queries) => {
   db.tx(context => {
     const promises = [];
     for (const query of queries) {
@@ -42,7 +48,7 @@ const installSchema = schema => {
     }
     return context.batch(promises);
   })
-  .then(data => {
+  .then(() => {
     db.$pool.end();
     console.log('Schema installed.');
     return '';
@@ -325,7 +331,12 @@ const schema = {
   }
 };
 
+// Define a function that installs the schema in the database.
+const installSchema = () => {
+  submitQueries(require('./db').db, schemaQueries(schema));
+}
+
 // Execute the function on the schema.
-installSchema(schema);
+installSchema();
 
 module.exports = {installSchema, schema};
