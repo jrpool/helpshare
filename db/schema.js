@@ -278,7 +278,7 @@ const schema = {
         fk: 'member(id)',
         nn: true
       },
-      relname: {
+      relation: {
         type: 'TEXT',
         nn: true
       },
@@ -300,7 +300,7 @@ const schema = {
       }
     },
     inserter: {
-      relname: {
+      relation: {
         type: 'TEXT',
         nn: true
       },
@@ -310,7 +310,7 @@ const schema = {
       }
     },
     deleter: {
-      relname: {
+      relation: {
         type: 'TEXT',
         nn: true
       },
@@ -320,7 +320,7 @@ const schema = {
       }
     },
     updater: {
-      relname: {
+      relation: {
         type: 'TEXT',
         nn: true
       },
@@ -334,7 +334,7 @@ const schema = {
       }
     },
     selecter: {
-      relname: {
+      relation: {
         type: 'TEXT',
         nn: true
       },
@@ -378,7 +378,7 @@ const schema = {
       },
       change: {
         member: 'member making the change',
-        relname: 'name of the changed table',
+        relation: 'name of the changed table',
         row: 'ID of the changed record',
         col: 'name of the changed column',
         old: 'value before the change (null if none)',
