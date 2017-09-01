@@ -56,7 +56,7 @@ const submitQueries = (db, queries) => {
   })
   .then(() => {
     db.$pool.end();
-    console.log('Schema installed.');
+    console.log('Queries completed.');
     return '';
   })
   .catch(error => {
@@ -79,7 +79,7 @@ const schema = {
         nn: true
       }
     },
-    status: {
+    role: {
       id: {
         type: 'SERIAL',
         pk: true
@@ -158,9 +158,9 @@ const schema = {
         fk: 'phase(id)',
         nn: true
       },
-      status: {
+      role: {
         type: 'INTEGER',
-        fk: 'status(id)',
+        fk: 'role(id)',
         nn: true
       }
     },
@@ -304,7 +304,7 @@ const schema = {
         type: 'TEXT',
         nn: true
       },
-      status: {
+      role: {
         type: 'INTEGER',
         nn: true
       }
@@ -314,7 +314,7 @@ const schema = {
         type: 'TEXT',
         nn: true
       },
-      status: {
+      role: {
         type: 'INTEGER',
         nn: true
       }
@@ -328,7 +328,7 @@ const schema = {
         type: 'TEXT',
         nn: true
       },
-      status: {
+      role: {
         type: 'INTEGER',
         nn: true
       }
@@ -342,7 +342,7 @@ const schema = {
         type: 'TEXT',
         nn: true
       },
-      status: {
+      role: {
         type: 'INTEGER',
         nn: true
       }
@@ -350,10 +350,10 @@ const schema = {
   },
   uniques: {
     mastery: ['member', 'skill'],
-    inserter: ['relation', 'status'],
-    deleter: ['relation', 'status'],
-    updater: ['relation', 'col', 'status'],
-    selecter: ['relation', 'status'],
+    inserter: ['relation', 'role'],
+    deleter: ['relation', 'role'],
+    updater: ['relation', 'col', 'role'],
+    selecter: ['relation', 'role'],
   },
   comments: {
     table: {
@@ -368,7 +368,7 @@ const schema = {
       rating: 'categories to which assessments assign help requests',
       request: 'assertions by members of desire to receive help',
       skill: 'item of knowledge',
-      status: 'privilege categories to which members belong'
+      role: 'privilege categories to which members belong'
     },
     column: {
       member: {

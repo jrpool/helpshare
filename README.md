@@ -12,7 +12,7 @@ Database-backed API supporting cooperative help management.
 
 This application addresses the following imaginary requirements:
 
-Our on-site community has about 100 members, each classified as to (1) phase and (2) status.
+Our on-site community has about 100 members, each classified as to (1) phase and (2) role.
 
 Members seek to acquire most or all of a list of about 400 listed skills, which are classified as to domain.
 
@@ -24,9 +24,9 @@ Members currently record their skill acquisitions in a central database and have
 
 We want an API that facilitates the giving and receiving of help in this situation. In the first trial version of the API, we want it to make the following things true:
 
-0. Members with status “manager” can add, amend, and reclassify members, phases, statuses, locations, and ratings. In lieu of deletion, these can be reclassified as obsolete.
+0. Members with role “manager” can add, amend, and reclassify members, phases, roles, locations, and ratings. In lieu of deletion, these can be reclassified as obsolete.
 
-1. Members with status “expert” can add, amend, and reclassify skills and domains. In lieu of deletion, a skill or domain can be reclassified as obsolete.
+1. Members with role “expert” can add, amend, and reclassify skills and domains. In lieu of deletion, a skill or domain can be reclassified as obsolete.
 
 2. Members can declare themselves to have mastered skills.
 
@@ -125,12 +125,13 @@ We envision that subsequent versions will include additional features. Some feat
 - Authentication.
 - Notifications to potential helpers.
 - Suspension of requests during times when requesters are unavailable.
-- Classification of members into on-call and regular statuses.
+- Classification of members into on-call and regular roles.
 - Assignments of helping duties for particular requests to on-call members.
 - Addition of modules (study units) as entities, with associated skills.
 - Addition of member groups as entities capable of making help requests.
 - Automatic termination of requests determined to be stale.
 - Status-based limitations of visibilities of some facts and changes.
+- Multiple simultaneous roles (roles) per member.
 ```
 
 The developers may consider these possible future extensions in their design of the initial version.

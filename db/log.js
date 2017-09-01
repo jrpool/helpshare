@@ -32,4 +32,4 @@ const logCreation = (doer, relname, id, object, colnames) => {
   return logChange(doer, relname, id, changes);
 };
 
-module.exports = {db, logChange, logCreation};
+module.exports = {insert, logChange, logCreation};

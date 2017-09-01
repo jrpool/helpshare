@@ -8,7 +8,7 @@ const hasTablePermission = (doer, agentType, relation, ownRow) => {
   return db.oneOrNone(`
     SELECT relation FROM ${agentType}
     WHERE (relation = ${relation} AND (
-      status = ${getStatus(doer)} OR (ownRow AND status = 0)
+      status = ${getStatus(doer)} OR (${ownRow} AND status = 0)
     )
   `);
 };
@@ -17,7 +17,7 @@ const hasColPermission = (doer, agentType, relation, col, ownRow) => {
   return db.oneOrNone(`
     SELECT relation FROM ${agentType}
     WHERE (relation = ${relation} AND col = ${col} AND (
-      status = ${getStatus(doer)} OR (ownRow AND status = 0)
+      status = ${getStatus(doer)} OR (${ownRow} AND status = 0)
     )
   `);
 };

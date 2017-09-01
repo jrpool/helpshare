@@ -7,7 +7,7 @@ const insert = (doer, relation, values) => {
   )
   .then(idRow => {
     for (const col of Object.keys(values)) {
-      log.insert(doer, ${relation}, idRow.id, col, values[col]);
+      log.insert(doer, relation, idRow.id, col, values[col]);
     }
     return '';
   })
