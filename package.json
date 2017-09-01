@@ -7,8 +7,8 @@
     "db_drop": "dropdb --if-exists helpshare",
     "db_reset": "dropdb --if-exists helpshare && createdb helpshare",
     "schema_reset": "node -e \"require('./db/schema').installSchema()\"",
-    "lint": "eslint db/*.js && exit 0",
-    "lint_fix": "eslint --fix db/*.js && exit 0",
+    "lint": "eslint server.js db/*.js && exit 0",
+    "lint_fix": "eslint --fix server.js db/*.js && exit 0",
     "start": "node src/server.js",
     "start_dev": "nodemon src/server.js",
     "test": "echo 'Error: no test specified' && exit 1"

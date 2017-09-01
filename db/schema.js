@@ -350,7 +350,7 @@ const schema = {
     deleter: ['relation', 'status'],
     updater: ['relation', 'col', 'status'],
     selecter: ['relation', 'status'],
-  }
+  },
   comments: {
     table: {
       assessment: 'reports on help requests',
@@ -391,7 +391,7 @@ const schema = {
 // Define a function that installs the schema in the database.
 const installSchema = () => {
   submitQueries(require('./db').db, schemaQueries(schema));
-}
+};
 
 // Execute the function on the schema.
 // installSchema();

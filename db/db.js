@@ -2,13 +2,6 @@ const pgp = require('pg-promise')();
 const connectionString = 'postgres://localhost:5432/helpshare';
 const db = pgp(connectionString);
 
-const getStatusName = memberID => {
-  return db.oneOrNone(`
-    SELECT status.description FROM member, status
-    WHERE id = ${memberID} AND status.id = member.status
-    `);
-};
-
 const logChange = (doer, relname, id, changes) => {
   const lists = [];
   for (const change of changes) {
@@ -32,4 +25,4 @@ const logCreation = (doer, relname, id, object, colnames) => {
   return logChange(doer, relname, id, changes);
 };
 
-module.exports = {db, getStatusName, logChange, logCreation};
+module.exports = {db, logChange, logCreation};
