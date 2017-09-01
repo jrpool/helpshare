@@ -28,6 +28,12 @@ const schemaQueries = schema => {
       `COMMENT ON TABLE ${tableName} IS '${schema.comments.table[tableName]}'`
     );
   }
+  for (const tableName of Object.keys(schema.uniques)) {
+    queries.push(
+      `ALTER TABLE ${tableName} `
+      + `ADD UNIQUE(${schema.uniques[tableName].join(', ')})`
+    );
+  }
   for (const tableName of Object.keys(schema.comments.column)) {
     for (const colName of Object.keys(schema.comments.column[tableName])) {
       queries.push(
@@ -292,8 +298,59 @@ const schema = {
         type: 'TEXT',
         nn: true
       }
-    }
+    },
+    inserter: {
+      relname: {
+        type: 'TEXT',
+        nn: true
+      },
+      status: {
+        type: 'INTEGER',
+        nn: true
+      }
+    },
+    deleter: {
+      relname: {
+        type: 'TEXT',
+        nn: true
+      },
+      status: {
+        type: 'INTEGER',
+        nn: true
+      }
+    },
+    updater: {
+      relname: {
+        type: 'TEXT',
+        nn: true
+      },
+      col: {
+        type: 'TEXT',
+        nn: true
+      },
+      status: {
+        type: 'INTEGER',
+        nn: true
+      }
+    },
+    selecter: {
+      relname: {
+        type: 'TEXT',
+        nn: true
+      },
+      status: {
+        type: 'INTEGER',
+        nn: true
+      }
+    },
   },
+  uniques: {
+    mastery: ['member', 'skill'],
+    inserter: ['relation', 'status'],
+    deleter: ['relation', 'status'],
+    updater: ['relation', 'col', 'status'],
+    selecter: ['relation', 'status'],
+  }
   comments: {
     table: {
       assessment: 'reports on help requests',

@@ -1,26 +1,28 @@
 const db = require('./db').db;
 const schema = require(./schema).db;
 
-const createMember = (doer, member) => {
-  db.getStatusName(doer)
-  .then(statusName => {
-    if (statusName === 'manager') {
-      db.one(
-        `
-          INSERT INTO member (fullname, handle, phase, status)
-          VALUES ($1, $2, $3, $4) RETURNING id
-        `, [member.fullname, member.handle, member.phase, member.status]
-      )
-      .then(idRow => {
-        logCreation(doer, 'member', idRow.id, member, [
-          'fullname', 'handle', 'phase', 'status'
-        ]);
-      })
-      .catch(error => error);
-    }
-    else {
-      throw new Error('createMember');
-    }
+const insertRights = {
+  manager: ['member', 'phase', 'status', 'location', 'mastery', 'rating', 'request', 'offer'],
+  expert: ['skill', 'domain'],
+
+}
+
+const insertRecord = (tableName, values) => {
+  db.none(
+    `
+      INSERT INTO ${tableName} VALUES ($1, $2, $3, $4) RETURNING id
+    `, [member.fullname, member.handle, member.phase, member.status]
+  )
+  .then(idRow => {
+    logCreation(doer, 'member', idRow.id, member, [
+      'fullname', 'handle', 'phase', 'status'
+    ]);
+  })
+  .catch(error => error);
+}
+else {
+  throw new Error('createMember');
+}
   })
   .catch(error => error);
 };
