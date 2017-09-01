@@ -1,3 +1,5 @@
+const submitQueries = require('./queries').submitQueries;
+
 /*
   Define a function that returns the queries to install a schema in
   the database.
@@ -43,26 +45,6 @@ const schemaQueries = schema => {
     }
   }
   return queries;
-};
-
-// Define a function that makes a set of queries to the database.
-const submitQueries = (db, queries) => {
-  db.tx(context => {
-    const promises = [];
-    for (const query of queries) {
-      promises.push(context.none(query));
-    }
-    return context.batch(promises);
-  })
-  .then(() => {
-    db.$pool.end();
-    console.log('Queries completed.');
-    return '';
-  })
-  .catch(error => {
-    db.$pool.end();
-    console.log('Error: ' + error);
-  });
 };
 
 // Define the schema of the database.
