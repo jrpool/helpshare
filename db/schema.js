@@ -338,6 +338,10 @@ const schema = {
         type: 'TEXT',
         nn: true
       },
+      col: {
+        type: 'TEXT',
+        nn: true
+      },
       status: {
         type: 'INTEGER',
         nn: true
