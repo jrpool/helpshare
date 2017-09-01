@@ -4,32 +4,22 @@ const getStatus = memberID => {
   return db.oneOrNone(`SELECT status FROM member WHERE id = ${memberID}`);
 };
 
-const getTablePermission = (doer, agentType, relation) => {
+const hasTablePermission = (doer, agentType, relation, ownRow) => {
   return db.oneOrNone(`
     SELECT relation FROM ${agentType}
-    WHERE relation = ${relation}
-    AND (status = ${getStatus(doer)}
+    WHERE (relation = ${relation} AND (
+      status = ${getStatus(doer)} OR (ownRow AND status = 0)
+    )
   `);
 };
 
-const getColPermission = (doer, agentType, relation, col) => {
+const hasColPermission = (doer, agentType, relation, col, ownRow) => {
   return db.oneOrNone(`
     SELECT relation FROM ${agentType}
-    WHERE relation = ${relation}
-    WHERE col = '${col}' `
-    AND status = ${getStatusName(doer)}`
+    WHERE (relation = ${relation} AND col = ${col} AND (
+      status = ${getStatus(doer)} OR (ownRow AND status = 0)
+    )
   `);
 };
 
-const hasPermission = (doer, operation, relation, col) => {
-  getStatusName(doer)
-  .then(statusName => {
-    if (statusName) {
-      if (col) {
-      }
-    }
-  })
-  .catch();
-};
-
-module.exports = {createMember, createPhase, createStatus};
+module.exports = {getStatus, hasTablePermission, hasColPermission};
