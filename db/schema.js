@@ -329,6 +329,12 @@ const schema = {
         new: 'value after the change (null if none)'
       }
     }
+  },
+  functions: {
+    logger: 'CREATE FUNCTION logger'
+  },
+  triggers: {
+    insert: 'CREATE TRIGGER log AFTER INSERT OR DELETE OR UPDATE ON member FOR EACH ROW EXECUTE PROCEDURE logger'
   }
 };
 
