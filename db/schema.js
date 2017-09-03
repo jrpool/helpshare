@@ -1,51 +1,4 @@
-const submitQueries = require('./queries').submitQueries;
-
-/*
-  Define a function that returns the queries to install a schema in
-  the database.
-*/
-const schemaQueries = schema => {
-  const queries = [];
-  const tableNames = Object.keys(schema.tables).reverse();
-  for (const tableName of tableNames) {
-    queries.push(`DROP TABLE IF EXISTS ${tableName}`);
-  }
-  for (const tableName of tableNames.reverse()) {
-    const table = schema.tables[tableName];
-    const queryCols = [];
-    for (const colName in table) {
-      const col = table[colName];
-      queryCols.push(
-        colName + ' ' + col.type
-        + (col.pk ? ' PRIMARY KEY' : '')
-        + (col.unique ? ' UNIQUE' : '')
-        + (col.fk ? ' REFERENCES ' + col.fk : '')
-        + (col.nn ? ' NOT NULL' : '')
-      );
-    }
-    queries.push(`CREATE TABLE ${tableName} (${queryCols.join(', ')})`);
-  }
-  for (const tableName of Object.keys(schema.comments.table)) {
-    queries.push(
-      `COMMENT ON TABLE ${tableName} IS '${schema.comments.table[tableName]}'`
-    );
-  }
-  for (const tableName of Object.keys(schema.uniques)) {
-    queries.push(
-      `ALTER TABLE ${tableName} `
-      + `ADD UNIQUE(${schema.uniques[tableName].join(', ')})`
-    );
-  }
-  for (const tableName of Object.keys(schema.comments.column)) {
-    for (const colName of Object.keys(schema.comments.column[tableName])) {
-      queries.push(
-        `COMMENT ON COLUMN ${tableName}.${colName} IS `
-        + `'${schema.comments.column[tableName][colName]}'`
-      );
-    }
-  }
-  return queries;
-};
+const queries = require('./queries');
 
 // Define the schema of the database.
 const schema = {
@@ -341,7 +294,9 @@ const schema = {
     table: {
       assessment: 'reports on help requests',
       change: 'log of changes to all other tables',
+      deleter: 'which roles have permission to delete rows from which tables',
       domain: 'subject categories to which skills belong',
+      inserter: 'which roles have permission to insert rows into which tables',
       location: 'physical parts of site where requesters are working',
       mastery: 'members’ possessions of skills',
       member: 'persons in a community served by HelpShare',
@@ -349,8 +304,11 @@ const schema = {
       phase: 'seniority categories to which members belong',
       rating: 'categories to which assessments assign help requests',
       request: 'assertions by members of desire to receive help',
+      role: 'privilege categories to which members belong',
+      selecter: 'which roles have permission to select from which columns of which tables',
       skill: 'item of knowledge',
-      role: 'privilege categories to which members belong'
+      updater: 'which roles have permission to update which columns of which tables'
+
     },
     column: {
       member: {
@@ -374,12 +332,104 @@ const schema = {
   }
 };
 
-// Define a function that installs the schema in the database.
-const installSchema = () => {
-  submitQueries(require('./db').db, schemaQueries(schema));
+// Define a function that returns a copy of the schema.
+const getSchema = () => {
+  return JSON.parse(JSON.stringify(schema));
 };
 
-// Execute the function on the schema.
-// installSchema();
+/*
+  Define a function that returns the queries to install a schema in
+  the database.
+*/
+const getInstallQueries = schema => {
+  const queries = [];
+  const tableNames = Object.keys(schema.tables).reverse();
+  for (const tableName of tableNames) {
+    queries.push(`DROP TABLE IF EXISTS ${tableName}`);
+  }
+  for (const tableName of tableNames.reverse()) {
+    const table = schema.tables[tableName];
+    const queryCols = [];
+    for (const colName in table) {
+      const col = table[colName];
+      queryCols.push(
+        colName + ' ' + col.type
+        + (col.pk ? ' PRIMARY KEY' : '')
+        + (col.unique ? ' UNIQUE' : '')
+        + (
+          col.fk
+            ? ' REFERENCES ' + col.fk + ' DEFERRABLE INITIALLY DEFERRED'
+            : ''
+        )
+        + (col.nn ? ' NOT NULL' : '')
+      );
+    }
+    queries.push(`CREATE TABLE ${tableName} (${queryCols.join(', ')})`);
+  }
+  for (const tableName of Object.keys(schema.comments.table)) {
+    queries.push(
+      `COMMENT ON TABLE ${tableName} IS '${schema.comments.table[tableName]}'`
+    );
+  }
+  for (const tableName of Object.keys(schema.uniques)) {
+    queries.push(
+      `ALTER TABLE ${tableName} `
+      + `ADD UNIQUE(${schema.uniques[tableName].join(', ')})`
+    );
+  }
+  for (const tableName of Object.keys(schema.comments.column)) {
+    for (const colName of Object.keys(schema.comments.column[tableName])) {
+      queries.push(
+        `COMMENT ON COLUMN ${tableName}.${colName} IS `
+        + `'${schema.comments.column[tableName][colName]}'`
+      );
+    }
+  }
+  return queries;
+};
 
-module.exports = {installSchema, schema};
+// Define a function that installs the schema in the database.
+const installSchema = () => {
+  queries.submit(getInstallQueries(schema))
+  .then(result => {
+    if (result === '') {
+      console.log('Schema installed.');
+    }
+  })
+  .catch(error => {
+    console.log('Error: ' + error);
+  });
+};
+
+// Define a function that minimally seeds the database.
+const miniseed = () => {
+  const seedSpecs = {
+    member: {
+      fullname: 'Temporary Manager', handle: 'tempmgr', phase: 1, role: 1
+    },
+    phase: {description: 'staff'},
+    role: {description: 'manager'},
+    inserter: {relation: 'inserter', role: 'manager'}
+  };
+  queries.insert(1, 'member', seedSpecs.member)
+  .then(value => {
+    if (value === '') {
+      return queries.insert(1, 'phase', seedSpecs.phase);
+    }
+  })
+  .then(value => {
+    if (value === '') {
+      return queries.insert(1, 'role', seedSpecs.role);
+    }
+  })
+  .then(value => {
+    if (value === '') {
+      return queries.insert(1, 'inserter', seedSpecs.inserter);
+    }
+  })
+  .catch(error => {
+    console.log('Error: ' + error);
+  });
+};
+
+module.exports = {installSchema, miniseed, getSchema};

@@ -7,6 +7,7 @@
     "db_drop": "dropdb --if-exists helpshare",
     "db_reset": "dropdb --if-exists helpshare && createdb helpshare",
     "schema_reset": "node -e \"require('./db/schema').installSchema()\"",
+    "db_miniseed": "node -e \"require('./db/schema').miniseed()\"",
     "lint": "eslint server.js db/*.js && exit 0",
     "lint_fix": "eslint --fix server.js db/*.js && exit 0",
     "start": "node src/server.js",
