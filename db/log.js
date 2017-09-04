@@ -2,10 +2,14 @@ const PQ = require('pg-promise').ParameterizedQuery;
 
 // Define a function that returns the log query for a query.
 const getLogQuery = (member, query) => {
-  return new PQ(
-    'INSERT INTO log VALUES (DEFAULT, CURRENT_TIMESTAMP(1), $1, 1, $2)',
-    [member, typeof query === 'string' ? query : query.text + ' [' + query.values + ']']
-  );
+  const text
+    = 'INSERT INTO log VALUES ('
+    + `DEFAULT, CURRENT_TIMESTAMP, ${member}, 'q', $1, $2`
+    + ')';
+  const values = typeof query === 'string'
+    ? [query, null]
+    : [query.text.replace(/[\n ]+/g, ' '), query.values.toString()];
+  return new PQ(text, values);
 };
 
 module.exports = {getLogQuery};
