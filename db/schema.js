@@ -233,6 +233,9 @@ const schema = {
       content: {
         type: 'TEXT',
         nn: true
+      },
+      addendum: {
+        type: 'TEXT'
       }
     },
     inserter: {
