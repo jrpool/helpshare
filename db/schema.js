@@ -387,7 +387,7 @@ const getInstallQueries = schema => {
 
 // Define a function that installs the schema in the database.
 const installSchema = () => {
-  queries.batchSubmit(1, getInstallQueries(schema), false)
+  queries.batchSubmit(1, getInstallQueries(getSchema()), false)
   .then(result => {
     if (result === '') {
       console.log('Schema installed.');
@@ -417,12 +417,12 @@ const getMiniseedQueries = () => {
       `INSERT INTO ${table} (${colList}) VALUES (${valParamList})`,
       specs[table][1]
     );
-  };
+  });
 };
 
 // Define a function that minimally seeds the database.
 const miniseed = () => {
-  queries.batchSubmit(1, getminiseedQueries(), true)
+  queries.batchSubmit(1, getMiniseedQueries(), true)
   .then(result => {
     if (result === '') {
       console.log('Database minimally seeded.');
@@ -433,4 +433,6 @@ const miniseed = () => {
   });
 };
 
-module.exports = {installSchema, miniseed, getSchema};
+module.exports = {
+  getInstallQueries, getMiniseedQueries, getSchema, installSchema, miniseed
+};
