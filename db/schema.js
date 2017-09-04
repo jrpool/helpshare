@@ -338,8 +338,8 @@ const getSchema = () => {
 };
 
 /*
-  Define a function that returns the queries to install a schema in
-  the database.
+  Define a function that returns the queries to install a schema in a
+  database.
 */
 const getInstallQueries = schema => {
   const queries = [];
@@ -397,7 +397,7 @@ const installSchema = () => {
     }
   })
   .catch(error => {
-    console.log('Error: ' + error);
+    console.log('Error (installSchema): ' + error);
   });
 };
 
@@ -410,7 +410,8 @@ const getMiniseedQueries = () => {
     ],
     phase: [['description'], ['staff']],
     role: [['description'], ['manager']],
-    inserter: [['relation', 'role'], ['inserter', 'manager']]
+    class: [['description'], ['query']],
+    inserter: [['relation', 'role'], ['inserter', 1]]
   };
   return Object.keys(specs).map(table => {
     const colList = specs[table][0].join(', ');
@@ -432,7 +433,7 @@ const miniseed = () => {
     }
   })
   .catch(error => {
-    console.log('Error: ' + error);
+    console.log('Error (miniseed): ' + error);
   });
 };
 
