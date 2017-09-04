@@ -1,5 +1,6 @@
 const db = require('./db').db;
 const log = require('./log');
+const PQ = require('pg-promise').ParameterizedQuery;
 
 /*
   Define a function that makes, and optionally logs, a batch of queries
@@ -21,9 +22,9 @@ const batchSubmit = (member, queries, areLogged) => {
     }
     return context.batch(promises);
   })
-  .then(() => {
+  .then(results => {
     db.$pool.end();
-    console.log('Queries completed.');
+    console.log(`Query batch (size ${results.length}) submitted.`);
     return '';
   })
   .catch(error => {
@@ -32,28 +33,39 @@ const batchSubmit = (member, queries, areLogged) => {
   });
 };
 
+// Define a function that returns an insertion query with ID returned.
+const getInsertQuery = (table, cols, values) => {
+  const colList = cols.join(', ');
+  const paramList = values.map((v, index) => '$' + (index + 1)).join(', ');
+  return new PQ(
+    `INSERT INTO ${table} (${colList}) VALUES (${paramList}) RETURNING id`,
+    values
+  );
+};
+
 /*
-  Define a function that makes, logs, and returns the result of an insertion
-  query that returns the ID of the inserted row. The query may be a string
-  or a parameterized query object.
+  Define a function that submits an insertion query that returns the ID of
+  the inserted row, logs it, and returns a promise resolvable with that ID.
+  The query may be a string or a parameterized query object.
 */
 const insert = (member, query) => {
   return db.tx(context => {
-    context.one(query)
-    .then(newID => {
+    return context.one(query)
+    .then(idRow => {
       context.none(log.getQueryQuery(member, query));
-      return newID;
+      return idRow.id;
     })
-    .then(newID => {
+    .then(id => {
       db.$pool.end();
-      console.log('Queries completed.');
-      return newID;
+      console.log('Insertion submitted and logged.');
+      console.log('New row has ID ' + id + '.');
+      return id;
     })
     .catch(error => {
       db.$pool.end();
-      console.log('Error (insert): ' + error);
+      console.log('Error (insert.tx): ' + error);
     });
   });
 };
 
-module.exports = {batchSubmit, insert};
+module.exports = {batchSubmit, getInsertQuery, insert};
