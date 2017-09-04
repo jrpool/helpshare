@@ -1,4 +1,5 @@
 const queries = require('./queries');
+const PQ = require('pg-promise').ParameterizedQuery;
 
 // Define the schema of the database.
 const schema = {
@@ -48,6 +49,17 @@ const schema = {
       }
     },
     rating: {
+      id: {
+        type: 'SERIAL',
+        pk: true
+      },
+      description: {
+        type: 'TEXT',
+        unique: true,
+        nn: true
+      }
+    },
+    class: {
       id: {
         type: 'SERIAL',
         pk: true
@@ -139,11 +151,11 @@ const schema = {
         type: 'TEXT'
       },
       started: {
-        type: 'TIMESTAMP',
+        type: 'TIMESTAMPTZ',
         nn: true
       },
       ended: {
-        type: 'TIMESTAMP',
+        type: 'TIMESTAMPTZ',
         nn: true
       }
     },
@@ -163,11 +175,11 @@ const schema = {
         nn: true
       },
       started: {
-        type: 'TIMESTAMP',
+        type: 'TIMESTAMPTZ',
         nn: true
       },
       ended: {
-        type: 'TIMESTAMP',
+        type: 'TIMESTAMPTZ',
         nn: true
       }
     },
@@ -195,17 +207,17 @@ const schema = {
         type: 'TEXT'
       },
       time: {
-        type: 'TIMESTAMP',
+        type: 'TIMESTAMPTZ',
         nn: true
       }
     },
-    change: {
+    log: {
       id: {
         type: 'SERIAL',
         pk: true
       },
       time: {
-        type: 'TIMESTAMP',
+        type: 'TIMESTAMPTZ',
         nn: true
       },
       member: {
@@ -213,23 +225,12 @@ const schema = {
         fk: 'member(id)',
         nn: true
       },
-      relation: {
-        type: 'TEXT',
-        nn: true
-      },
-      row: {
+      class: {
         type: 'INTEGER',
+        fk: 'class(id)',
         nn: true
       },
-      col: {
-        type: 'TEXT',
-        nn: true
-      },
-      old: {
-        type: 'TEXT',
-        nn: true
-      },
-      new: {
+      content: {
         type: 'TEXT',
         nn: true
       }
@@ -293,11 +294,12 @@ const schema = {
   comments: {
     table: {
       assessment: 'reports on help requests',
-      change: 'log of changes to all other tables',
+      class: 'types of log entries',
       deleter: 'which roles have permission to delete rows from which tables',
       domain: 'subject categories to which skills belong',
       inserter: 'which roles have permission to insert rows into which tables',
       location: 'physical parts of site where requesters are working',
+      log: 'log of commands and other events',
       mastery: 'members’ possessions of skills',
       member: 'persons in a community served by HelpShare',
       offer: 'assertions by members of intent to provide requested help',
@@ -320,13 +322,8 @@ const schema = {
       assessment: {
         member: 'member making the assessment'
       },
-      change: {
-        member: 'member making the change',
-        relation: 'name of the changed table',
-        row: 'ID of the changed record',
-        col: 'name of the changed column',
-        old: 'value before the change (null if none)',
-        new: 'value after the change (null if none)'
+      log: {
+        member: 'member issuing the command or taking the action',
       }
     }
   }
@@ -390,7 +387,7 @@ const getInstallQueries = schema => {
 
 // Define a function that installs the schema in the database.
 const installSchema = () => {
-  queries.submit(getInstallQueries(schema))
+  queries.batchSubmit(1, getInstallQueries(schema), false)
   .then(result => {
     if (result === '') {
       console.log('Schema installed.');
@@ -401,30 +398,34 @@ const installSchema = () => {
   });
 };
 
+// Define a function that returns the queries to minimally seed the database.
+const getMiniseedQueries = () => {
+  const specs = {
+    member: [
+      ['fullname', 'handle', 'phase', 'role'],
+      ['Temporary Manager', 'tempmgr', 1, 1]
+    ],
+    phase: [['description'], ['staff']],
+    role: [['description'], ['manager']],
+    inserter: [['relation', 'role'], ['inserter', 'manager']]
+  };
+  return Object.keys(specs).map(table => {
+    const colList = specs[table][0].join(', ');
+    const valParamList
+      = specs[table][1].map((v, index) => '$' + (index + 1)).join(', ');
+    return new PQ(
+      `INSERT INTO ${table} (${colList}) VALUES (${valParamList})`,
+      specs[table][1]
+    );
+  };
+};
+
 // Define a function that minimally seeds the database.
 const miniseed = () => {
-  const seedSpecs = {
-    member: {
-      fullname: 'Temporary Manager', handle: 'tempmgr', phase: 1, role: 1
-    },
-    phase: {description: 'staff'},
-    role: {description: 'manager'},
-    inserter: {relation: 'inserter', role: 'manager'}
-  };
-  queries.insert(1, 'member', seedSpecs.member)
-  .then(value => {
-    if (value === '') {
-      return queries.insert(1, 'phase', seedSpecs.phase);
-    }
-  })
-  .then(value => {
-    if (value === '') {
-      return queries.insert(1, 'role', seedSpecs.role);
-    }
-  })
-  .then(value => {
-    if (value === '') {
-      return queries.insert(1, 'inserter', seedSpecs.inserter);
+  queries.batchSubmit(1, getminiseedQueries(), true)
+  .then(result => {
+    if (result === '') {
+      console.log('Database minimally seeded.');
     }
   })
   .catch(error => {

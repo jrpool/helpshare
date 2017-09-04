@@ -1,5 +1,13 @@
 const PQ = require('pg-promise').ParameterizedQuery;
 
+// Define a function that returns the log query for a query.
+const getLogQuery = (member, query) => {
+  return new PQ(
+    `INSERT INTO log VALUES (DEFAULT, STATEMENT_TIMESTAMP, $1, 1, $2)`,
+    [member, typeof query === 'string' ? query : query.text + ' [' + query.values + ']']
+  );
+};
+
 /*
   Define a function that returns an array of parameterized query objects
   for the creation of log entries for a row insertion or deletion.
@@ -29,4 +37,4 @@ const getUpdateQuery = (tx, doer, table, id, col, oldValue, newValue) => {
   return tx.none(new PQ(text, params));
 };
 
-module.exports = {getRowQueries, getUpdateQuery};
+module.exports = {getLogQuery, getRowQueries, getUpdateQuery};
