@@ -21,9 +21,9 @@ const batchSubmit = (member, queries, areLogged) => {
     }
     return context.batch(promises);
   })
-  .then(results => {
+  .then(() => {
     db.$pool.end();
-    console.log(`Query batch (size ${results.length}) submitted.`);
+    console.log('Queries completed.');
     return '';
   })
   .catch(error => {
@@ -33,26 +33,25 @@ const batchSubmit = (member, queries, areLogged) => {
 };
 
 /*
-  Define a function that makes an insertion query that returns the ID of the
-  inserted row, logs it, and returns a promise resolvable with that ID. The
-  query may be a string or a parameterized query object.
+  Define a function that makes, logs, and returns the result of an insertion
+  query that returns the ID of the inserted row. The query may be a string
+  or a parameterized query object.
 */
 const insert = (member, query) => {
   return db.tx(context => {
-    return context.one(query)
-    .then(idRow => {
+    context.one(query)
+    .then(newID => {
       context.none(log.getQueryQuery(member, query));
-      return idRow.id;
+      return newID;
     })
-    .then(id => {
+    .then(newID => {
       db.$pool.end();
-      console.log('Insertion submitted and logged.');
-      console.log('New row has ID ' + id + '.');
-      return id;
+      console.log('Queries completed.');
+      return newID;
     })
     .catch(error => {
       db.$pool.end();
-      console.log('Error (insert.tx): ' + error);
+      console.log('Error (insert): ' + error);
     });
   });
 };
