@@ -1,17 +1,17 @@
 const express = require('express');
 const app = express();
-const bodyParser = require('body-parser');
-const memberModel = require('../model/members');
+const JSONParser = require('body-parser').json({type: '*/*'});
+const memberModel = require('./src/model/members');
 
-app.use(bodyParser);
+app.use(JSONParser);
 
-app.post('/:user/member', (request, response, next) => {
+app.post('/:user/member', (request, response) => {
   const {member, fullname, handle, phase, role} = request.body;
-  memberModel.create(member, fullname, handle, phase, role)
+  return memberModel.create(member, fullname, handle, phase, role)
   .then(newID => {
     console.log(`New member ${fullname} has ID ${newID}.`);
-  })
-  res.send(JSON.stringify(newID));
+    response.send(JSON.stringify(newID));
+  });
 });
 
 app.listen(3000, function() {

@@ -1,4 +1,5 @@
-const queries = require('./queries');
+const db = require('./db').db;
+const log = require('./log');
 const PQ = require('pg-promise').ParameterizedQuery;
 
 // Define the schema of the database.
@@ -338,6 +339,37 @@ const getSchema = () => {
 };
 
 /*
+  Define a function that makes, and optionally logs, a batch of queries
+  returning no result within a transaction. Each query may be a string
+  or a parameterized query object.
+*/
+const batchSubmit = (member, queries, areLogged) => {
+  const finalQueries = queries.slice();
+  if (areLogged) {
+    const logQueries = queries.map(query => {
+      return log.getQueryQuery(member, query);
+    });
+    finalQueries.push(...logQueries);
+  }
+  return db.tx(context => {
+    const promises = [];
+    for (const query of finalQueries) {
+      promises.push(context.none(query));
+    }
+    return context.batch(promises);
+  })
+  .then(results => {
+    db.$pool.end();
+    console.log(`Query batch (size ${results.length}) submitted.`);
+    return '';
+  })
+  .catch(error => {
+    db.$pool.end();
+    console.log('Error (batchSubmit): ' + error);
+  });
+};
+
+/*
   Define a function that returns the queries to install a schema in a
   database.
 */
@@ -390,7 +422,7 @@ const getInstallQueries = schema => {
 
 // Define a function that installs the schema in the database.
 const installSchema = () => {
-  queries.batchSubmit(1, getInstallQueries(getSchema()), false)
+  batchSubmit(1, getInstallQueries(getSchema()), false)
   .then(result => {
     if (result === '') {
       console.log('Schema installed.');
@@ -426,7 +458,7 @@ const getMiniseedQueries = () => {
 
 // Define a function that minimally seeds the database.
 const miniseed = () => {
-  queries.batchSubmit(1, getMiniseedQueries(), true)
+  batchSubmit(1, getMiniseedQueries(), true)
   .then(result => {
     if (result === '') {
       console.log('Database minimally seeded.');
