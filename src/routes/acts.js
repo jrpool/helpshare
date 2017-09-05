@@ -5,16 +5,14 @@ router.post('/', (request, response) => {
   const {member, fullname, handle, phase, role} = request.body;
   return memberModel.create(member, fullname, handle, phase, role)
   .then(newID => {
-    console.log('Result has type ' + typeof newID);
-    const requester = request.body.requester;
     response.send(
       typeof newID === 'number'
-      ? `Member ${requester} created member ${fullname} with ID ${newID}.\n`
-      : `Error creating member ${fullname}.\n`
+      ? `Member ${request.params.user} created new member ${fullname} with ID ${newID}.\n`
+      : 'Error creating a member.\n'
     );
   })
   .catch(error => {
-    response.send('Error (routes/members/post): ' + error.message);
+    response.send('Error: ' + error.message);
   });
 });
 

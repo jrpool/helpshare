@@ -9,7 +9,18 @@ const create = (member, fullname, handle, phase, role) => {
     'member',
     ['fullname', 'handle', 'phase', 'role'],
     [fullname, handle, phase, role]
-  ));
+  ))
+  .then(id => {
+    if (typeof id !== 'number') {
+      throw 1;
+    }
+    else {
+      return id;
+    }
+  })
+  .catch(error => {
+    console.log('Error (models/members/create): ' + error.message);
+  })
 };
 
 module.exports = {create};

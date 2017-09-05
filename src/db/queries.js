@@ -21,6 +21,7 @@ const insert = (member, query) => {
   return db.tx(context => {
     return context.one(query)
     .then(idRow => {
+      console.log('About to submit log query.');
       context.none(log.getQueryQuery(member, query));
       return idRow.id;
     })
