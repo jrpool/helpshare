@@ -144,7 +144,7 @@ The above requirements are modeled with 12 interrelated objects. A summary of th
 
 The model is implemented with a database, in which each of the 12 objects is represented by a table. The schema is shown in this diagram:
 
-<img src='helpshare.png' alt='entity-relationship diagram for database'>
+<img src='public/helpshare.png' alt='entity-relationship diagram for database'>
 
 ### Project Origin
 

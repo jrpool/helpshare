@@ -1,8 +1,8 @@
 const queries = require('../db/queries');
 
 /*
-  Define a function that creates a member and returns a promise resolvable
-  with the ID of the new member.
+  Define a function that creates a right and returns a promise resolvable
+  with the ID of the new right.
 */
 const create = (requester, fullname, handle, phase, role) => {
   return queries.insert(requester, queries.getInsertQuery(

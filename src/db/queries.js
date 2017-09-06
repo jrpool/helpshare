@@ -13,25 +13,19 @@ const getInsertQuery = (table, cols, values) => {
 };
 
 /*
-  Define a function that submits an insertion query that returns the ID of
+  Define a function that submits an insertion query returning the ID of
   the inserted row, logs it, and returns a promise resolvable with that ID.
   The query may be a string or a parameterized query object.
 */
-const insert = (member, query) => {
+const insert = (requester, query) => {
   return db.tx(context => {
     return context.one(query)
     .then(idRow => {
-      console.log('About to submit log query.');
-      context.none(log.getQueryQuery(member, query));
+      context.none(log.getQueryQuery(requester, query));
       return idRow.id;
     })
-    .then(id => {
-      console.log('Insertion submitted and logged.');
-      console.log('New row has ID ' + id + '.');
-      return id;
-    })
     .catch(error => {
-      console.log('Error (insert.tx): ' + error);
+      console.log('Error (insert): ' + error);
     });
   });
 };

@@ -81,6 +81,11 @@ const schema = {
         fk: 'domain(id)',
         nn: true
       },
+      phase: {
+        type: 'INTEGER',
+        fk: 'phase(id)',
+        nn: true
+      },
       description: {
         type: 'TEXT',
         unique: true,
@@ -343,11 +348,11 @@ const getSchema = () => {
   returning no result within a transaction. Each query may be a string
   or a parameterized query object.
 */
-const batchSubmit = (member, queries, areLogged) => {
+const batchSubmit = (requester, queries, areLogged) => {
   const finalQueries = queries.slice();
   if (areLogged) {
     const logQueries = queries.map(query => {
-      return log.getQueryQuery(member, query);
+      return log.getQueryQuery(requester, query);
     });
     finalQueries.push(...logQueries);
   }

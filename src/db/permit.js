@@ -1,25 +1,25 @@
 const db = require('./db').db;
 
-const getStatus = memberID => {
-  return db.oneOrNone(`SELECT status FROM member WHERE id = ${memberID}`);
+const getRole = memberID => {
+  return db.oneOrNone(`SELECT role FROM member WHERE id = ${memberID}`);
 };
 
-const hasTablePermission = (doer, agentType, relation, ownRow) => {
+const hasTablePermission = (requester, agentType, table, ownRow) => {
   return db.oneOrNone(`
     SELECT relation FROM ${agentType}
-    WHERE (relation = ${relation} AND (
-      status = ${getStatus(doer)} OR (${ownRow} AND status = 0)
+    WHERE (relation = ${table} AND (
+      status = ${getRole(requester)} OR (${ownRow} AND role = 0)
     )
   `);
 };
 
-const hasColPermission = (doer, agentType, relation, col, ownRow) => {
+const hasColPermission = (requester, agentType, table, col, ownRow) => {
   return db.oneOrNone(`
     SELECT relation FROM ${agentType}
-    WHERE (relation = ${relation} AND col = ${col} AND (
-      status = ${getStatus(doer)} OR (${ownRow} AND status = 0)
+    WHERE (relation = ${table} AND col = ${col} AND (
+      role = ${getRole(requester)} OR (${ownRow} AND role = 0)
     )
   `);
 };
 
-module.exports = {getStatus, hasTablePermission, hasColPermission};
+module.exports = {getRole, hasTablePermission, hasColPermission};
