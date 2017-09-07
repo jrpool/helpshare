@@ -1,26 +1,33 @@
-const queries = require('../db/queries');
+const dbQueries = require('../db/queries');
+const dbAgents = require('../db/agents');
 
 /*
-  Define a function that creates a member and returns a promise resolvable
-  with the ID of the new member.
+  Define a function that, if the requester is so authorized, creates a
+  member and returns a promise resolvable with the ID of the new member.
 */
 const create = (requester, fullname, handle, phase, role) => {
-  return queries.insert(requester, queries.getInsertQuery(
-    'member',
-    ['fullname', 'handle', 'phase', 'role'],
-    [fullname, handle, phase, role]
-  ))
+  return dbAgents.hasRow(requester, 'inserter', 'member', false)
+  .then(table => {
+    if (table) {
+      return dbQueries.insert(requester, queries.getInsertQuery(
+        'member',
+        ['fullname', 'handle', 'phase', 'role'],
+        [fullname, handle, phase, role]
+      ))
+    }
+    else {
+      throw `Member ${requester} may not create a member.\n`;
+    }
+  })
   .then(id => {
     if (typeof id !== 'number') {
-      throw 1;
+      throw 'Member insertion failed.';
     }
     else {
       return id;
     }
   })
-  .catch(error => {
-    console.log('Error (models/members/create): ' + error.message);
-  });
+  .catch(error => error);
 };
 
 module.exports = {create};

@@ -10,7 +10,7 @@ router.post('/', (request, response) => {
     response.send(
       typeof newID === 'number'
         ? `Member ${requester} created member ${fullname} with ID ${newID}.\n`
-        : `Error creating member ${fullname}.\n`
+        : `Error creating member ${fullname}:\n${newID}`
     );
   })
   .catch(error => {
