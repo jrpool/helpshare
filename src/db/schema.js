@@ -244,7 +244,7 @@ const schema = {
         type: 'TEXT'
       }
     },
-    inserter: {
+    add_row: {
       relation: {
         type: 'TEXT',
         nn: true
@@ -254,7 +254,7 @@ const schema = {
         nn: true
       }
     },
-    deleter: {
+    kill_row: {
       relation: {
         type: 'TEXT',
         nn: true
@@ -264,7 +264,7 @@ const schema = {
         nn: true
       }
     },
-    updater: {
+    change_col: {
       relation: {
         type: 'TEXT',
         nn: true
@@ -278,7 +278,7 @@ const schema = {
         nn: true
       }
     },
-    selecter: {
+    read_col: {
       relation: {
         type: 'TEXT',
         nn: true
@@ -295,18 +295,18 @@ const schema = {
   },
   uniques: {
     mastery: ['member', 'skill'],
-    inserter: ['relation', 'role'],
-    deleter: ['relation', 'role'],
-    updater: ['relation', 'col', 'role'],
-    selecter: ['relation', 'role'],
+    add_row: ['relation', 'role'],
+    kill_row: ['relation', 'role'],
+    change_col: ['relation', 'col', 'role'],
+    read_col: ['relation', 'role'],
   },
   comments: {
     table: {
       assessment: 'reports on help requests',
       class: 'types of log entries',
-      deleter: 'which roles have permission to delete rows from which tables',
+      kill_row: 'powers to delete rows from tables',
       domain: 'subject categories to which skills belong',
-      inserter: 'which roles have permission to insert rows into which tables',
+      add_row: 'powers to insert rows into tables',
       location: 'physical parts of site where requesters are working',
       log: 'log of commands and other events',
       mastery: 'members’ possessions of skills',
@@ -316,9 +316,9 @@ const schema = {
       rating: 'categories to which assessments assign help requests',
       request: 'assertions by members of desire to receive help',
       role: 'privilege categories to which members belong',
-      selecter: 'which roles have permission to select from which columns of which tables',
+      read_col: 'powers to select columns from tables',
       skill: 'item of knowledge',
-      updater: 'which roles have permission to update which columns of which tables'
+      change_col: 'powers to update columns of tables'
 
     },
     column: {
@@ -448,7 +448,7 @@ const getMiniseedQueries = () => {
     phase: [['description'], ['staff']],
     role: [['description'], ['manager']],
     class: [['description'], ['query']],
-    inserter: [['relation', 'role'], ['inserter', 1]]
+    add_row: [['relation', 'role'], ['add_row', 1]]
   };
   return Object.keys(specs).map(table => {
     const colList = specs[table][0].join(', ');

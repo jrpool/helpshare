@@ -1,12 +1,12 @@
 const dbQueries = require('../db/queries');
-const dbAgents = require('../db/agents');
+const dbPowers = require('../db/powers');
 
 /*
   Define a function that, if the requester is so authorized, creates a
   member and returns a promise resolvable with the ID of the new member.
 */
 const create = (requester, fullname, handle, phase, role) => {
-  return dbAgents.hasRow(requester, 'inserter', 'member', false)
+  return dbPowers.hasRow(requester, 'inserter', 'member', false)
   .then(table => {
     if (table) {
       return dbQueries.insert(requester, queries.getInsertQuery(

@@ -1,13 +1,13 @@
 const queries = require('../db/queries');
-const dbAgents = require('../db/agents');
+const dbPowers = require('../db/powers');
 
 /*
-  Define a function that, if the requester is an inserter authorized to do
-  so, creates a column agent (i.e. an updater or a selecter) and returns a
-  promise resolvable with the ID of the new agent.
+  Define a function that, if there is an authorizing add_row power, creates
+  a column power (i.e. change_col or read_col) and returns a promise
+  resolvable with the ID of the new power.
 */
-const colCreate = (requester, agent, table, col, role) => {
-  return dbAgents.hasRow(requester, 'inserter', agent, false)
+const colCreate = (requester, power, table, col, role) => {
+  return dbPowers.hasRow(requester, 'inserter', power, false)
   .then(table => {
     if (table) {
       return dbQueries.insert(requester, queries.getInsertQuery(
@@ -34,7 +34,7 @@ const colCreate = (requester, agent, table, col, role) => {
 
 
   return queries.insert(requester, queries.getInsertQuery(
-    agent, ['relation', 'col', 'role'], [table, col, role]
+    power, ['relation', 'col', 'role'], [table, col, role]
   ))
   .then(id => {
     if (typeof id !== 'number') {
@@ -45,7 +45,7 @@ const colCreate = (requester, agent, table, col, role) => {
     }
   })
   .catch(error => {
-    console.log('Error (model/agents/colCreate): ' + error.message);
+    console.log('Error (model/powers/colCreate): ' + error.message);
   });
 };
 
@@ -66,7 +66,7 @@ const rowCreate = (requester, right, table, role) => {
     }
   })
   .catch(error => {
-    console.log('Error (model/agents/rowCreate): ' + error.message);
+    console.log('Error (model/powers/rowCreate): ' + error.message);
   });
 };
 
