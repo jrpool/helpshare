@@ -21,8 +21,8 @@ const insert = (requester, query) => {
   return db.tx(context => {
     return context.one(query)
     .then(idRow => {
-      context.none(log.getQueryQuery(requester, query));
-      return idRow.id;
+      return context.none(log.getQueryQuery(requester, query))
+        .then(() => idRow.id);
     })
     .catch(error => {
       console.log('Error (insert): ' + error);
