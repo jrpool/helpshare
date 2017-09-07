@@ -22,7 +22,7 @@ const insert = (requester, query) => {
     return context.one(query)
     .then(idRow => {
       return context.none(log.getQueryQuery(requester, query))
-        .then(() => idRow.id)
+        .then(() => idRow.id);
     })
     .catch(error => {
       console.log('Error (insert): ' + error);
