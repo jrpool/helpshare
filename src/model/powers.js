@@ -1,73 +1,46 @@
-const queries = require('../db/queries');
+const dbQueries = require('../db/queries');
 const dbPowers = require('../db/powers');
 
 /*
   Define a function that, if there is an authorizing add_row power, creates
-  a column power (i.e. change_col or read_col) and returns a promise
-  resolvable with the ID of the new power.
+  a column power (i.e. “change” or “read”), logs it, and returns a promise
+  resolvable with true.
 */
 const colCreate = (requester, power, table, col, role) => {
-  return dbPowers.hasRow(requester, 'inserter', power, false)
-  .then(table => {
-    if (table) {
-      return dbQueries.insert(requester, queries.getInsertQuery(
-        'member',
-        ['fullname', 'handle', 'phase', 'role'],
-        [fullname, handle, phase, role]
-      ))
+  const powerTable = `${power}_col`;
+  return dbPowers.hasRow(requester, 'add', powerTable, false)
+  .then(resultRow => {
+    if (resultRow.has_power) {
+      return dbQueries.insert(requester, dbQueries.getInsertQuery(
+        powerTable, [table, col, role]
+      ));
     }
     else {
-      throw `Member ${requester} may not create a member.\n`;
-    }
-  })
-  .then(id => {
-    if (typeof id !== 'number') {
-      throw 'Member insertion failed.';
-    }
-    else {
-      return id;
+      return false;
     }
   })
   .catch(error => error);
-
-
-
-
-  return queries.insert(requester, queries.getInsertQuery(
-    power, ['relation', 'col', 'role'], [table, col, role]
-  ))
-  .then(id => {
-    if (typeof id !== 'number') {
-      throw 1;
-    }
-    else {
-      return id;
-    }
-  })
-  .catch(error => {
-    console.log('Error (model/powers/colCreate): ' + error.message);
-  });
 };
 
 /*
-  Define a function that creates a row right and returns a promise resolvable
-  with the ID of the new right.
+  Define a function that, if there is an authorizing add_row power, creates
+  a row power (i.e. “add” or “kill”), logs it, and returns a promise
+  resolvable with true.
 */
-const rowCreate = (requester, right, table, role) => {
-  return queries.insert(requester, queries.getInsertQuery(
-    right, ['relation', 'role'], [table, role]
-  ))
-  .then(id => {
-    if (typeof id !== 'number') {
-      throw 1;
+const rowCreate = (requester, power, table, role) => {
+  const powerTable = `${power}_row`;
+  return dbPowers.hasRow(requester, 'add', powerTable, false)
+  .then(resultRow => {
+    if (resultRow.has_power) {
+      return dbQueries.insert(requester, dbQueries.getInsertQuery(
+        powerTable, [table, role]
+      ));
     }
     else {
-      return id;
+      return false;
     }
   })
-  .catch(error => {
-    console.log('Error (model/powers/rowCreate): ' + error.message);
-  });
+  .catch(error => error);
 };
 
-module.exports = {create};
+module.exports = {colCreate, rowCreate};

@@ -1,33 +1,61 @@
 const db = require('./db').db;
 const log = require('./log');
 const PQ = require('pg-promise').ParameterizedQuery;
+const schema = require('./schema').getSchema();
 
-// Define a function that returns an insertion query with ID returned.
-const getInsertQuery = (table, cols, values) => {
-  const colList = cols.join(', ');
-  const paramList = values.map((v, index) => '$' + (index + 1)).join(', ');
-  return new PQ(
-    `INSERT INTO ${table} (${colList}) VALUES (${paramList}) RETURNING id`,
-    values
-  );
+/*
+  Define a function that returns a query inserting values into a table.
+  Require the count of values to be equal to the count of non-ID columns
+  and assume they are given in the table’s column order. Make the query
+  return the ID of the inserted row, if the table has an ID column, or
+  otherwise return nothing.
+*/
+const getInsertQuery = (table, values) => {
+  const allCols = Object.keys(schema.tables[table]);
+  console.log('allCols is ' + allCols);
+  const cols = allCols.filter(value => value !== 'id');
+  if (values.length === cols.length) {
+    const colList = cols.join(', ');
+    const paramList = cols.map((v, index) => `$${index + 1}`).join(', ');
+    const returnClause = allCols.includes('id') ? ' RETURNING id' : '';
+    console.log('returnClause is ' + returnClause);
+    return new PQ(
+      `INSERT INTO ${table} (${colList}) VALUES (${paramList})${returnClause}`,
+      values
+    );
+  }
 };
 
 /*
-  Define a function that submits an insertion query returning the ID of
-  the inserted row, logs it, and returns a promise resolvable with that ID.
-  The query may be a string or a parameterized query object.
+  Define a function that submits an insertion query returning an ID, logs it,
+  and returns a promise resolvable with that ID. The query may be a string
+  or a parameterized query object.
 */
-const insert = (requester, query) => {
-  return db.tx(context => {
+const insertAndGetID = (requester, query) => {
+  return db.task(context => {
     return context.one(query)
     .then(idRow => {
-      context.none(log.getQueryQuery(requester, query));
-      return idRow.id;
+      return context.none(log.getQueryQuery(requester, query))
     })
-    .catch(error => {
-      console.log('Error (insert): ' + error);
-    });
-  });
+  })
+  .then(() => idRow.id)
+  .catch(error => error);
 };
 
-module.exports = {getInsertQuery, insert};
+/*
+  Define a function that submits an insertion query returning nothing,
+  logs it, and returns a promise resolvable with true. The query may be
+  a string or a parameterized query object.
+*/
+const insert = (requester, query) => {
+  return db.task(context => {
+    return context.none(query)
+    .then(() => {
+      return context.none(log.getQueryQuery(requester, query));
+    })
+  })
+  .then(() => true)
+  .catch(error => error);
+};
+
+module.exports = {insertAndGetID, getInsertQuery, insert};

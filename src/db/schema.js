@@ -251,6 +251,7 @@ const schema = {
       },
       role: {
         type: 'INTEGER',
+        fk: 'role(id)',
         nn: true
       }
     },
@@ -261,6 +262,7 @@ const schema = {
       },
       role: {
         type: 'INTEGER',
+        fk: 'role(id)',
         nn: true
       }
     },
@@ -275,6 +277,7 @@ const schema = {
       },
       role: {
         type: 'INTEGER',
+        fk: 'role(id)',
         nn: true
       }
     },
@@ -289,6 +292,7 @@ const schema = {
       },
       role: {
         type: 'INTEGER',
+        fk: 'role(id)',
         nn: true
       }
     },

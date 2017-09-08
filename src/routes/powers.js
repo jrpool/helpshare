@@ -1,18 +1,55 @@
-const router = require('express').Router();
-const memberModel = require('../model/members');
+// This module routes all power requests. Prefix: “/powers”.
 
-router.post('/', (request, response) => {
-  const {member, fullname, handle, phase, role} = request.body;
-  return memberModel.create(member, fullname, handle, phase, role)
-  .then(newID => {
-    response.send(
-      typeof newID === 'number'
-        ? `Member ${request.params.user} created new member ${fullname} with ID ${newID}.\n`
-        : 'Error creating a member.\n'
-    );
+const router = require('express').Router();
+const powerModel = require('../model/powers');
+
+// Handle requests to create column powers (i.e. “change” or “read”).
+router.post('/col/:power(change|read)', (request, response) => {
+  const power = request.params.power;
+  const {requester, table, col, role} = request.body;
+  powerModel.colCreate(requester, power, table, col, role)
+  .then(result => {
+    if (typeof result === 'object') {
+      response.send(
+        'Error (routes/powers/post/col):\n'
+        + `${result.message}.\n${result.detail}\n`
+      );
+    }
+    else {
+      response.send(
+        result
+          ? `Member ${requester} created a power`
+            + `to ${power} column ${col} of table ${table}.\n`
+          : `Member ${requester} may not create ${power} column powers.\n`
+      );
+    }
   })
   .catch(error => {
-    response.send('Error: ' + error.message);
+    response.send('Error (routes/powers/post/col): ' + error + '\n');
+  });
+});
+
+// Handle requests to create row powers (i.e. “add” or “kill”).
+router.post('/row/:power(add|kill)', (request, response) => {
+  const power = request.params.power;
+  const {requester, table, role} = request.body;
+  powerModel.rowCreate(requester, power, table, role)
+  .then(result => {
+    const messages = {
+      true: `Member ${requester} created a power to ${power} ${table} rows.\n`,
+      false: `Member ${requester} may not create ${power} row powers.\n`,
+      error: 'Error (routes/powers/post/row):\n'
+        + `${result.message}.\n${result.detail}\n`
+    };
+    if (typeof result === 'object') {
+      response.send(messages.error);
+    }
+    else {
+      response.send(result ? messages.true : messages.false);
+    }
+  })
+  .catch(error => {
+    response.send('Error (routes/powers/post/row): ' + error + '\n');
   });
 });
 
