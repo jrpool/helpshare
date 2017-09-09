@@ -22,6 +22,11 @@ const getInsertQuery = (table, values) => {
       values
     );
   }
+  else {
+    const error = new Error('Wrong value count.');
+    error.detail = `${values.length}, but should be ${cols.length}.`;
+    throw error;
+  }
 };
 
 /*

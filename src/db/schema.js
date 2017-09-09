@@ -108,8 +108,7 @@ const schema = {
       },
       phase: {
         type: 'INTEGER',
-        fk: 'phase(id)',
-        nn: true
+        fk: 'phase(id)'
       }
     },
     roleplay: {
