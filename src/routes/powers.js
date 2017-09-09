@@ -44,7 +44,7 @@ router.post('/row/:power(add|kill)', (request, response) => {
     else {
       response.send(
         result
-          ? `Member ${requester} created a power`
+          ? `Member ${requester} created a power `
             + `to ${power} ${table} rows.\n`
           : `Member ${requester} may not create ${power} row powers.\n`
       );
