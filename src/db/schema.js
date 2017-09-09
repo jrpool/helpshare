@@ -122,7 +122,7 @@ const schema = {
         fk: 'member(id)',
         nn: true
       },
-      skill: {
+      role: {
         type: 'INTEGER',
         fk: 'role(id)',
         nn: true
@@ -310,6 +310,7 @@ const schema = {
   },
   uniques: {
     mastery: ['member', 'skill'],
+    roleplay: ['member', 'role'],
     add_row: ['relation', 'role'],
     kill_row: ['relation', 'role'],
     change_col: ['relation', 'col', 'role'],
@@ -330,8 +331,9 @@ const schema = {
       phase: 'seniority categories to which members belong',
       rating: 'categories to which assessments assign help requests',
       request: 'assertions by members of desire to receive help',
-      role: 'privilege categories to which members belong',
       read_col: 'powers to select columns from tables',
+      role: 'privilege categories to which members belong',
+      roleplay: 'members’ possessions of roles',
       skill: 'item of knowledge',
       change_col: 'powers to update columns of tables'
 
@@ -457,11 +459,12 @@ const installSchema = () => {
 const getMiniseedQueries = () => {
   const specs = {
     member: [
-      ['fullname', 'handle', 'phase', 'role'],
-      ['Temporary Manager', 'tempmgr', 1, 1]
+      ['fullname', 'handle', 'phase'],
+      ['Temporary Manager', 'tempmgr', 1]
     ],
     phase: [['description'], ['staff']],
     role: [['description'], ['manager']],
+    roleplay: [['member', 'role'], [1, 1]],
     class: [['description'], ['query']],
     add_row: [['relation', 'role'], ['add_row', 1]]
   };
