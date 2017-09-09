@@ -10,13 +10,14 @@ const hasCol = (requester, power, table, col, isOwn) => {
   const powerTable = `${power}_col`;
   const pq = new PQ(
     `
-      SELECT ${powerTable}.relation > 0 AS has_power
-      FROM ${powerTable}, member
+      SELECT COUNT(${powerTable}.relation) > 0 AS has_power
+      FROM ${powerTable}, member, roleplay
       WHERE ${powerTable}.relation = $1
       AND ${powerTable}.col = $2
       AND member.id = $3
       AND (
-        ${powerTable}.role = member.role OR ($4 AND ${powerTable}.role = 0)
+        ($4 AND ${powerTable}.role = 0)
+        OR (roleplay.role = ${powerTable}.role AND member.id = roleplay.member)
       )
     `,
     [table, col, requester, isOwn]
@@ -38,7 +39,8 @@ const hasRow = (requester, power, table, isOwn) => {
       WHERE ${powerTable}.relation = $1
       AND member.id = $2
       AND (
-        ${powerTable}.role = member.role OR ($3 AND ${powerTable}.role = 0)
+        ($3 AND ${powerTable}.role = 0)
+        OR (roleplay.role = ${powerTable}.role AND member.id = roleplay.member)
       )
     `,
     [table, requester, isOwn]

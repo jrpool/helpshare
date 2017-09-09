@@ -18,7 +18,7 @@ router.post('/col/:power(change|read)', (request, response) => {
     else {
       response.send(
         result
-          ? `Member ${requester} created a power`
+          ? `Member ${requester} created a power `
             + `to ${power} column ${col} of table ${table}.\n`
           : `Member ${requester} may not create ${power} column powers.\n`
       );

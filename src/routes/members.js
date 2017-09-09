@@ -8,18 +8,19 @@ router.post('/', (request, response) => {
   const {requester, fullname, handle, phase, role} = request.body;
   memberModel.create(requester, fullname, handle, phase, role)
   .then(result => {
-    const messages = {
-      true: `Member ${requester} created member ${fullname} `
-        + `with ID ${result}.\n`,
-      false: `Member ${requester} may not create members.\n`,
-      error: 'Error (routes/members/post):\n'
-        + `${result.message}.\n${result.detail}\n`
-    };
     if (typeof result === 'object') {
-      response.send(messages.error);
+      response.send(
+        'Error (routes/members/post):\n'
+        + `${result.message}.\n${result.detail}\n`
+      );
     }
     else {
-      response.send(result ? messages.true : messages.false);
+      response.send(
+        result
+          ? `Member ${requester} created member ${fullname} `
+            + `with ID ${result}.\n`
+          : `Member ${requester} may not create members.\n`
+      );
     }
   })
   .catch(error => {

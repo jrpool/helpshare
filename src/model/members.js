@@ -18,7 +18,9 @@ const create = (requester, fullname, handle, phase, role) => {
       return false;
     }
   })
-  .catch(error => error);
+  .catch(error => {
+    return error;
+  });
 };
 
 module.exports = {create};

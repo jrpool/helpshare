@@ -37,7 +37,9 @@ const insertAndGetID = (requester, query) => {
       .then(() => idRow.id);
     });
   })
-  .catch(error => error);
+  .catch(error => {
+    return error;
+  });
 };
 
 /*

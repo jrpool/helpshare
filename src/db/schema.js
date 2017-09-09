@@ -110,8 +110,19 @@ const schema = {
         type: 'INTEGER',
         fk: 'phase(id)',
         nn: true
+      }
+    },
+    roleplay: {
+      id: {
+        type: 'SERIAL',
+        pk: true
       },
-      role: {
+      member: {
+        type: 'INTEGER',
+        fk: 'member(id)',
+        nn: true
+      },
+      skill: {
         type: 'INTEGER',
         fk: 'role(id)',
         nn: true
