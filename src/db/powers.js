@@ -35,7 +35,7 @@ const hasRow = (requester, power, table, isOwn) => {
   const pq = new PQ(
     `
       SELECT COUNT(${powerTable}.relation) > 0 AS has_power
-      FROM ${powerTable}, member
+      FROM ${powerTable}, member, roleplay
       WHERE ${powerTable}.relation = $1
       AND member.id = $2
       AND (
