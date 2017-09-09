@@ -458,7 +458,6 @@ const installSchema = () => {
 const getMiniseedQueries = () => {
   const specs = {
     member: [['fullname', 'handle'], ['Temporary Manager', 'tempmgr']],
-    phase: [['description'], ['staff']],
     role: [['description'], ['manager']],
     roleplay: [['member', 'role'], [1, 1]],
     class: [['description'], ['query']],
