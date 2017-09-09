@@ -35,17 +35,19 @@ router.post('/row/:power(add|kill)', (request, response) => {
   const {requester, table, role} = request.body;
   powerModel.rowCreate(requester, power, table, role)
   .then(result => {
-    const messages = {
-      true: `Member ${requester} created a power to ${power} ${table} rows.\n`,
-      false: `Member ${requester} may not create ${power} row powers.\n`,
-      error: 'Error (routes/powers/post/row):\n'
-        + `${result.message}.\n${result.detail}\n`
-    };
     if (typeof result === 'object') {
-      response.send(messages.error);
+      response.send(
+        'Error (routes/powers/post/row):\n'
+        + `${result.message}.\n${result.detail}\n`
+      );
     }
     else {
-      response.send(result ? messages.true : messages.false);
+      response.send(
+        result
+          ? `Member ${requester} created a power`
+            + `to ${power} ${table} rows.\n`
+          : `Member ${requester} may not create ${power} row powers.\n`
+      );
     }
   })
   .catch(error => {

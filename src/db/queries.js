@@ -12,13 +12,11 @@ const schema = require('./schema').getSchema();
 */
 const getInsertQuery = (table, values) => {
   const allCols = Object.keys(schema.tables[table]);
-  console.log('allCols is ' + allCols);
   const cols = allCols.filter(value => value !== 'id');
   if (values.length === cols.length) {
     const colList = cols.join(', ');
     const paramList = cols.map((v, index) => `$${index + 1}`).join(', ');
     const returnClause = allCols.includes('id') ? ' RETURNING id' : '';
-    console.log('returnClause is ' + returnClause);
     return new PQ(
       `INSERT INTO ${table} (${colList}) VALUES (${paramList})${returnClause}`,
       values
@@ -36,9 +34,9 @@ const insertAndGetID = (requester, query) => {
     return context.one(query)
     .then(idRow => {
       return context.none(log.getQueryQuery(requester, query))
-    })
+      .then(() => idRow.id);
+    });
   })
-  .then(() => idRow.id)
   .catch(error => error);
 };
 
@@ -52,7 +50,7 @@ const insert = (requester, query) => {
     return context.none(query)
     .then(() => {
       return context.none(log.getQueryQuery(requester, query));
-    })
+    });
   })
   .then(() => true)
   .catch(error => error);

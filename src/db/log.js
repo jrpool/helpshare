@@ -6,7 +6,7 @@ const PQ = require('pg-promise').ParameterizedQuery;
 */
 const getQueryQuery = (member, query) => {
   const text
-    = `INSERT INTO log VALUES (DEFAULT, CURRENT_TIMESTAMP, $1, 1, $2, $3)`;
+    = 'INSERT INTO log VALUES (DEFAULT, CURRENT_TIMESTAMP, $1, 1, $2, $3)';
   const values = typeof query === 'string'
     ? [member, query, null]
     : [
