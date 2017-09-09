@@ -60,7 +60,7 @@ const schema = {
         nn: true
       }
     },
-    class: {
+    genre: {
       id: {
         type: 'SERIAL',
         pk: true
@@ -75,16 +75,6 @@ const schema = {
       id: {
         type: 'SERIAL',
         pk: true
-      },
-      domain: {
-        type: 'INTEGER',
-        fk: 'domain(id)',
-        nn: true
-      },
-      phase: {
-        type: 'INTEGER',
-        fk: 'phase(id)',
-        nn: true
       },
       description: {
         type: 'TEXT',
@@ -124,6 +114,22 @@ const schema = {
       role: {
         type: 'INTEGER',
         fk: 'role(id)',
+        nn: true
+      }
+    },
+    relevance: {
+      id: {
+        type: 'SERIAL',
+        pk: true
+      },
+      skill: {
+        type: 'INTEGER',
+        fk: 'skill(id)',
+        nn: true
+      },
+      domain: {
+        type: 'INTEGER',
+        fk: 'domain(id)',
         nn: true
       }
     },
@@ -241,7 +247,7 @@ const schema = {
         fk: 'member(id)',
         nn: true
       },
-      class: {
+      genre: {
         type: 'INTEGER',
         fk: 'class(id)',
         nn: true
@@ -308,6 +314,7 @@ const schema = {
     },
   },
   uniques: {
+    relevance: ['skill', 'domain'],
     mastery: ['member', 'skill'],
     roleplay: ['member', 'role'],
     add_row: ['relation', 'role'],
@@ -317,11 +324,11 @@ const schema = {
   },
   comments: {
     table: {
-      assessment: 'reports on help requests',
-      class: 'types of log entries',
-      kill_row: 'powers to delete rows from tables',
-      domain: 'subject categories to which skills belong',
       add_row: 'powers to insert rows into tables',
+      assessment: 'reports on help requests',
+      domain: 'subject categories to which skills belong',
+      genre: 'types of log entries',
+      kill_row: 'powers to delete rows from tables',
       location: 'physical parts of site where requesters are working',
       log: 'log of commands and other events',
       mastery: 'members’ possessions of skills',
@@ -329,6 +336,7 @@ const schema = {
       offer: 'assertions by members of intent to provide requested help',
       phase: 'seniority categories to which members belong',
       rating: 'categories to which assessments assign help requests',
+      relevance: 'skills’ pertinence to domains',
       request: 'assertions by members of desire to receive help',
       read_col: 'powers to select columns from tables',
       role: 'privilege categories to which members belong',
@@ -460,7 +468,7 @@ const getMiniseedQueries = () => {
     member: [['fullname', 'handle'], ['Temporary Manager', 'tempmgr']],
     role: [['description'], ['manager']],
     roleplay: [['member', 'role'], [1, 1]],
-    class: [['description'], ['query']],
+    genre: [['description'], ['query']],
     add_row: [['relation', 'role'], ['add_row', 1]]
   };
   return Object.keys(specs).map(table => {

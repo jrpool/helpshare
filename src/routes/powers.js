@@ -4,7 +4,7 @@ const router = require('express').Router();
 const powerModel = require('../model/powers');
 
 // Handle requests to create column powers (i.e. “change” or “read”).
-router.post('/col/:power(change|read)', (request, response) => {
+router.post('/col/:power(^change$|^read$)', (request, response) => {
   const power = request.params.power;
   const {requester, table, col, role} = request.body;
   powerModel.colCreate(requester, power, table, col, role)
@@ -30,7 +30,7 @@ router.post('/col/:power(change|read)', (request, response) => {
 });
 
 // Handle requests to create row powers (i.e. “add” or “kill”).
-router.post('/row/:power(add|kill)', (request, response) => {
+router.post('/row/:power(^add$|^kill$)', (request, response) => {
   const power = request.params.power;
   const {requester, table, role} = request.body;
   powerModel.rowCreate(requester, power, table, role)

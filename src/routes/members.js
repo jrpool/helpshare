@@ -17,8 +17,7 @@ router.post('/', (request, response) => {
     else {
       response.send(
         result
-          ? `Member ${requester} created member ${fullname} `
-            + `with ID ${result}.\n`
+          ? `Member ${requester} created member ${result} (${handle}).\n`
           : `Member ${requester} may not create members.\n`
       );
     }
