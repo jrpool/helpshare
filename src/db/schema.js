@@ -457,10 +457,7 @@ const installSchema = () => {
 // Define a function that returns the queries to minimally seed the database.
 const getMiniseedQueries = () => {
   const specs = {
-    member: [
-      ['fullname', 'handle', 'phase'],
-      ['Temporary Manager', 'tempmgr', 1]
-    ],
+    member: [['fullname', 'handle'], ['Temporary Manager', 'tempmgr']],
     phase: [['description'], ['staff']],
     role: [['description'], ['manager']],
     roleplay: [['member', 'role'], [1, 1]],
