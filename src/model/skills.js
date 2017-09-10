@@ -50,12 +50,12 @@ const createDomain = (requester, description) => {
   a domain, logs it, and returns a promise resolvable with the ID of the
   new domain.
 */
-const createRelevance = (requester, description) => {
+const createRelevance = (requester, skill, domain) => {
   return dbPowers.hasRow(requester, 'add', 'relevance', false)
   .then(resultRow => {
     if (resultRow.has_power) {
       return dbQueries.insertAndGetID(requester, dbQueries.getInsertQuery(
-        'relevance', [description]
+        'relevance', [skill, domain]
       ));
     }
     else {
