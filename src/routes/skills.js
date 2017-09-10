@@ -88,7 +88,7 @@ router.post('/claim', (request, response) => {
     else {
       response.send(
         result
-          ? `Member ${requester} created claim ${result} on skill (${skill}).\n`
+          ? `Member ${requester} created claim ${result} on skill ${skill}.\n`
           : `Member ${requester} may not create claims.\n`
       );
     }

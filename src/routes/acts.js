@@ -51,4 +51,28 @@ router.post('/ratings', (request, response) => {
   });
 });
 
+// Handle requests to create requests.
+router.post('/ask', (request, response) => {
+  const {requester, skill, location, comment} = request.body;
+  actModel.createRequest(requester, skill, location, comment)
+  .then(result => {
+    if (typeof result === 'object') {
+      response.send(
+        'Error (routes/acts/post/ask):\n'
+        + `${result.message}\n${result.detail}\n`
+      );
+    }
+    else {
+      response.send(
+        result
+          ? `Member ${requester} created request ${result} on skill ${skill}.\n`
+          : `Member ${requester} may not create requests.\n`
+      );
+    }
+  })
+  .catch(error => {
+    response.send('Error (routes/acts/post/ask):\n' + error + '\n');
+  });
+});
+
 module.exports = router;

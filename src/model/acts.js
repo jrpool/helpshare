@@ -45,4 +45,28 @@ const createRating = (requester, description) => {
   });
 };
 
-module.exports = {createLocation, createRating};
+/*
+  Define a function that, if there is an authorizing own-row add_row power,
+  creates a request, logs it, and returns a promise resolvable with the ID
+  of the new request.
+*/
+const createRequest = (requester, skill, location, comment) => {
+  return dbPowers.hasRow(requester, 'add', 'request', false)
+  .then(resultRow => {
+    if (resultRow.has_power) {
+      return dbQueries.insertAndGetID(requester, dbQueries.getInsertQuery(
+        'request', [
+          skill, requester, location, comment, Date.now(), null
+        ]
+      ));
+    }
+    else {
+      return false;
+    }
+  })
+  .catch(error => {
+    return error;
+  });
+};
+
+module.exports = {createLocation, createRating, createRequest};

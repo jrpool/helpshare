@@ -68,12 +68,12 @@ const createRelevance = (requester, skill, domain) => {
 };
 
 /*
-  Define a function that, if there is an authorizing add_row power, creates
-  a claim, logs it, and returns a promise resolvable with the ID of the
-  new claim.
+  Define a function that, if there is an authorizing own-row add_row power,
+  creates a claim, logs it, and returns a promise resolvable with the ID
+  of the new claim.
 */
-const createClaim = (requester, description) => {
-  return dbPowers.hasRow(requester, 'add', 'claim', false)
+const createClaim = (requester, skill) => {
+  return dbPowers.hasRow(requester, 'add', 'claim', true)
   .then(resultRow => {
     if (resultRow.has_power) {
       return dbQueries.insertAndGetID(requester, dbQueries.getInsertQuery(
