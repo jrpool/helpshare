@@ -8,6 +8,7 @@
     "db_reset": "dropdb -e --if-exists helpshare && createdb -ehelpshare",
     "schema_reset": "node -e \"require('./src/db/schema').installSchema()\"",
     "miniseed": "node -e \"require('./src/db/schema').miniseed()\"",
+    "sampleseed": "source ./sampleseed.txt",
     "start": "node ./server.js",
     "start_dev": "nodemon ./server.js",
     "lint": "eslint server.js src/**/*.js && exit 0",

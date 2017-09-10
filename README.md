@@ -8,35 +8,37 @@ Database-backed API supporting cooperative help management.
 
 ## Discussion
 
-### Requirements
+### Requirement Summary
 
 This application addresses the following imaginary requirements:
 
-Our on-site community has about 100 members, each classified as to (1) phase and (2) role.
+Our on-site community has about 100 members. Each member has at least 1 role. Members in the learner role (“learners”) are also in 1 of 5 phases.
 
-Members seek to acquire most or all of a list of about 400 listed skills, which are classified as to domain.
+Learners seek to master about 400 skills. Each skill is in at least 1 domain.
 
-Members pursue the skills in different sequences and at different paces. By design, all members both learn and help others learn. At any time, when a member experiences difficulty acquiring a skill, other members who have that skill are expected to help.
+By design, all learners both learn and help others learn. Members can request help and respond to requests by offering help.
 
-One of the obstacles to the exchange of help is a lack of coordination and transparency. Imagine that you are a learner wanting help with skill 328. How should you request it? Should you broadcast your request or direct it to a specific potential helper? If the former, won’t the community experience intolerable message traffic? If the latter, to whom? How can you know which other members already have that skill? How will a potential helper know whether another member has already agreed to help you? How will your request be retired when resolved?
+An application that supports the efficient matching of requests and offers and collects data on the learning and helping processes may make the community more effective.
 
-Members currently record their skill acquisitions in a central database and have access only to their own skill records.
+### Requirement Details
 
-We want an API that facilitates the giving and receiving of help in this situation. In the first trial version of the API, we want it to make the following things true:
+Version 0 will be an API only. It will make the following things true:
 
-0. Members with role “manager” can add, amend, and reclassify members, phases, roles, locations, and ratings. In lieu of deletion, these can be reclassified as obsolete.
+0. Members with role “manager” can add and amend members, phases, and roles.
 
-1. Members with role “expert” can add, amend, and reclassify skills and domains. In lieu of deletion, a skill or domain can be reclassified as obsolete.
+1. Members with role “expert” can add and amend skills and domains.
 
-2. Members can declare themselves to have mastered skills.
+2. Learners can add and delete claims that they have mastered skills.
 
-3. Any member wanting help with a skill can open a request. Because the site is large enough to interfere with a helper finding a requester, the request specifies where on the site the requester is located. The request optionally also includes a comment. The request remains open until terminated. Its maker can amend its location and/or its comment, or terminate it, while it is open.
+3. Learners can open and close help requests. Each request specifies the skill on which help is requested and the learner’s location on the site. Members with role “manager” can add and amend locations. Each request optionally also includes a comment. Its maker can amend a request’s location and/or its comment.
 
-4. Any member other than the maker of a request can make a help offer for an open request. The offer remains open until terminated. Its maker can terminate it. If an open request is terminated, all open offers for it are automatically terminated.
+4. Members other than makers of requests can open and close help offers for requests while open. The closing of a request closes all open offers for it.
 
-5. The member who has made a request and each member who has made a help offer for the request can create an assessment for the request. The assessment has a type and an optional comment.
+5. Members can create and amend assessments of offers (and thus of the requests for that the offers are for). Each assessment contains a rating and optionally a comment. Members with role “manager” can add and amend permitted ratings.
 
-6. All members can see the following facts:
+6. Events are logged.
+
+7. All members can see the following facts:
 
 ```
 I. ENTITIES
@@ -46,29 +48,37 @@ a. ID.
 b. Name.
 c. Handle.
 d. Phase.
-e. Status.
 
 B. Phases:
 a. ID.
 b. Description.
 
-C. Statuses:
+C. Roles:
 a. ID.
 b. Description.
 
 D. Skills:
 a. ID.
-b. Domain.
-c. Description.
+b. Description.
 
 E. Domains:
 a. ID.
 b. Description.
 
+F. Roleplays:
+a. ID.
+b. Member.
+c. Role.
+
 F. Masteries:
 a. ID.
 b. Member.
 c. Skill.
+
+F. Relevances:
+a. ID.
+b. Skill.
+c. Domain.
 
 G. Locations:
 a. ID.
@@ -86,65 +96,61 @@ b. Skill.
 c. Member.
 d. Location.
 e. Comment.
-f. When made.
-g. When terminated.
+f. When opened.
+g. When closed.
 
 B. Offers:
 a. ID.
 b. Request.
 c. Maker.
-d. When made.
-e. When terminated.
+d. When opened.
+e. When closed.
 
 C. Assessments:
 a. ID.
-b. Request.
-c. Reporter.
+b. Offer.
+c. Assessor.
 d. Rating.
 e. Comment.
 
-D. Changes:
+D. Event log:
 a. ID.
-b. Date and time.
+b. When occurred.
 c. Maker.
-d. Thing changed.
-e. Property changed.
-f. Old value.
-g. New value.
+d. Genre.
+e. Content.
+f. Addendum.
 
-III. INTEGRATIONS
+III. OPTIONAL REPORTS
 
-Reports that members would likely want, combining and summarizing the above facts.
+Reports combining and summarizing the above facts.
 ```
 
-7. The API trusts the source of all queries to be an agent that is authorized to access the API on behalf of a member. Each query identifies that member.
+8. Each request to the API identifies a member as the maker of the request. The API trusts the authenticity of that member.
 
-We envision that subsequent versions will include additional features. Some features likely to be subsequently required are:
+### Future Requirements
+
+Future versions may include the following additional features:
 
 ```
-- Authentication.
-- Notifications to potential helpers.
-- Suspension of requests during times when requesters are unavailable.
-- Classification of members into on-call and regular roles.
-- Assignments of helping duties for particular requests to on-call members.
+- A web interface to the API.
+- Authentication of requests.
+- Notifications to members who have mastered skills for which help requests have been opened.
+- Suspension of help requests during times when requesters are unavailable.
+- Implementation of an on-call role.
 - Addition of modules (study units) as entities, with associated skills.
 - Addition of member groups as entities capable of making help requests.
 - Automatic termination of requests determined to be stale.
-- Status-based limitations of visibilities of some facts and changes.
-- Multiple simultaneous roles (roles) per member.
+- Role-based limitations of visibilities of some facts and events.
 ```
-
-The developers may consider these possible future extensions in their design of the initial version.
 
 ## Implementation
 
-The above requirements are modeled with 12 interrelated objects. A summary of the main objects and their relationships is shown in this diagram:
+The above requirements are modeled in a database whose schema is summarized and diagrammed below.
 
-<img src='summary.png' alt='members need skills, make help requests, and answer help requests'>
+<img style="text-align: center" src='summary.png' alt='members need skills, make help requests, and answer help requests'>
 
-The model is implemented with a database, in which each of the 12 objects is represented by a table. The schema is shown in this diagram:
-
-<img src='public/helpshare.png' alt='entity-relationship diagram for database'>
+<img style="text-align: center" src='public/helpshare.png' alt='entity-relationship diagram for database'>
 
 ### Project Origin
 
@@ -153,8 +159,6 @@ This application was created in fulfillment of the requirements of the “Pizza 
 As the module’s title suggests, the requirement is to model aspects of a pizza restaurant and develop a database and API to satisfy a set of specifications related to such an operation.
 
 However, the module also states, “Please feel free to adapt the content of the data to your personal preferences or adjust your schema to support any other data types or operations you can think of. Get creative!” The above requirements were adopted under the license granted by that statement.
-
-### Implementation notes
 
 ## Installation and Configuration
 
@@ -182,15 +186,23 @@ Make that parent directory your working directory, by executing, for example:
 
 5. To create the database, execute `npm run db_reset`.
 
-6. If you wish to define a custom encryption key for the session IDs that the application stores in client cookies, execute `echo SECRET=customkey > .env`, where you replace `customkey` with the string of your choice.
+6. To equip it with the schema, execute `npm run schema_reset`.
 
-7. If you wish to put some sample data into the database, execute `npm run load_seeds`.
+7. To seed it with the minimal required data to permit the API to fulfill requests, execute `npm run miniseed`.
+
+8. After minimally seeding it, to further seed it with a sample of additional imaginary data, execute `npm run sampleseed`.
 
 8. To start the application, execute `npm start`.
 
-9. To access the application while it is running, use a web browser to request this URL:
+9. To access the API while it is running, issue HTTP requests to `http://localhost:3000` as specified below:
 
-`http://localhost:3000/`
+| Method |         URL        |        Body properties [optional]       |
+| ------ | ------------------ | --------------------------------------- |
+| POST   | `/members`         | `fullname`, `handle`, `[phase]`         |
+| POST   | `/roles/grant`     | `member`, `role`                        |
+| POST   | `/roles`           | `description`                           |
+
+(in progress)
 
 [lg]: https://www.learnersguild.org
 [npm]: https://www.npmjs.com/
