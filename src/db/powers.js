@@ -16,7 +16,7 @@ const hasCol = (requester, power, table, col, isOwn) => {
       AND ${powerTable}.col = $2
       AND member.id = $3
       AND (
-        ($4 AND ${powerTable}.role = 0)
+        ($4 AND ${powerTable}.role IS NULL)
         OR (roleplay.role = ${powerTable}.role AND member.id = roleplay.member)
       )
     `,
@@ -39,7 +39,7 @@ const hasRow = (requester, power, table, isOwn) => {
       WHERE ${powerTable}.relation = $1
       AND member.id = $2
       AND (
-        ($3 AND ${powerTable}.role = 0)
+        ($3 AND ${powerTable}.role IS NULL)
         OR (roleplay.role = ${powerTable}.role AND member.id = roleplay.member)
       )
     `,

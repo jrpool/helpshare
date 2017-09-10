@@ -23,4 +23,26 @@ const create = (requester, fullname, handle, phase) => {
   });
 };
 
-module.exports = {create};
+/*
+  Define a function that, if there is an authorizing add_row power, creates
+  a phase, logs it, and returns a promise resolvable with the ID of the
+  new phase.
+*/
+const createPhase = (requester, description) => {
+  return dbPowers.hasRow(requester, 'add', 'phase', false)
+  .then(resultRow => {
+    if (resultRow.has_power) {
+      return dbQueries.insertAndGetID(requester, dbQueries.getInsertQuery(
+        'phase', [description]
+      ));
+    }
+    else {
+      return false;
+    }
+  })
+  .catch(error => {
+    return error;
+  });
+};
+
+module.exports = {create, createPhase};

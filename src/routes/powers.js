@@ -15,12 +15,21 @@ router.post('/col/:power(change|read)', (request, response) => {
         + `${result.message}.\n${result.detail}\n`
       );
     }
+    else if (!result) {
+      response.send(
+        `Member ${requester} may not create ${power} column powers.\n`
+      );
+    }
+    else if (role) {
+      response.send(
+        `Member ${requester} permitted role ${role} `
+          + `to ${power} column ${col} of table ${table}.\n`
+      );
+    }
     else {
       response.send(
-        result
-          ? `Member ${requester} created a power `
-            + `to ${power} column ${col} of table ${table}.\n`
-          : `Member ${requester} may not create ${power} column powers.\n`
+        `Member ${requester} permitted members to ${power} `
+        + `column ${col} of their own rows of table ${table}.\n`
       );
     }
   })
@@ -41,12 +50,21 @@ router.post('/row/:power(add|kill)', (request, response) => {
         + `${result.message}.\n${result.detail}\n`
       );
     }
+    else if (!result) {
+      response.send(
+        `Member ${requester} may not create ${power} row powers.\n`
+      );
+    }
+    else if (role) {
+      response.send(
+        `Member ${requester} permitted role ${role} `
+          + `to ${power} ${table} rows.\n`
+      );
+    }
     else {
       response.send(
-        result
-          ? `Member ${requester} created a power `
-            + `to ${power} ${table} rows.\n`
-          : `Member ${requester} may not create ${power} row powers.\n`
+        `Member ${requester} permitted members to ${power} `
+        + `their own rows of table ${table}.\n`
       );
     }
   })

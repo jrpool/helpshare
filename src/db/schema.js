@@ -267,8 +267,7 @@ const schema = {
       },
       role: {
         type: 'INTEGER',
-        fk: 'role(id)',
-        nn: true
+        fk: 'role(id)'
       }
     },
     kill_row: {
@@ -278,8 +277,7 @@ const schema = {
       },
       role: {
         type: 'INTEGER',
-        fk: 'role(id)',
-        nn: true
+        fk: 'role(id)'
       }
     },
     change_col: {
@@ -293,8 +291,7 @@ const schema = {
       },
       role: {
         type: 'INTEGER',
-        fk: 'role(id)',
-        nn: true
+        fk: 'role(id)'
       }
     },
     read_col: {
@@ -308,8 +305,7 @@ const schema = {
       },
       role: {
         type: 'INTEGER',
-        fk: 'role(id)',
-        nn: true
+        fk: 'role(id)'
       }
     },
   },
@@ -326,6 +322,7 @@ const schema = {
     table: {
       add_row: 'powers to insert rows into tables',
       assessment: 'reports on help offers',
+      change_col: 'powers to update columns of tables',
       domain: 'subject categories to which skills belong',
       genre: 'types of log entries',
       kill_row: 'powers to delete rows from tables',
@@ -341,22 +338,33 @@ const schema = {
       read_col: 'powers to select columns from tables',
       role: 'privilege categories to which members belong',
       roleplay: 'members’ possessions of roles',
-      skill: 'item of knowledge',
-      change_col: 'powers to update columns of tables'
+      skill: 'item of knowledge'
 
     },
     column: {
+      add_row: {
+        role: 'empowered role, or null if members may add own rows'
+      },
+      assessment: {
+        member: 'member making the assessment'
+      },
+      change_col: {
+        role: 'empowered role, or null if members may update own rows’ column'
+      },
+      kill_row: {
+        role: 'empowered role, or null if members may delete own rows'
+      },
+      log: {
+        member: 'member issuing the command or taking the action',
+      },
       member: {
         handle: 'Github username'
       },
       offer: {
         member: 'member making the offer'
       },
-      assessment: {
-        member: 'member making the assessment'
-      },
-      log: {
-        member: 'member issuing the command or taking the action',
+      read_col: {
+        role: 'empowered role, or null if members may select own rows’ column'
       }
     }
   }
