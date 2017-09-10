@@ -47,16 +47,16 @@ const createRating = (requester, description) => {
 
 /*
   Define a function that, if there is an authorizing own-row add_row power,
-  creates a request, logs it, and returns a promise resolvable with the ID
-  of the new request.
+  creates a call, logs it, and returns a promise resolvable with the ID
+  of the new call.
 */
-const createRequest = (requester, skill, location, comment) => {
-  return dbPowers.hasRow(requester, 'add', 'request', false)
+const createCall = (requester, skill, location, comment) => {
+  return dbPowers.hasRow(requester, 'add', 'call', true)
   .then(resultRow => {
     if (resultRow.has_power) {
       return dbQueries.insertAndGetID(requester, dbQueries.getInsertQuery(
-        'request', [
-          skill, requester, location, comment, Date.now(), null
+        'call', [
+          skill, requester, location, comment, new Date().toUTCString(), null
         ]
       ));
     }
@@ -69,4 +69,54 @@ const createRequest = (requester, skill, location, comment) => {
   });
 };
 
-module.exports = {createLocation, createRating, createRequest};
+/*
+  Define a function that, if there is an authorizing own-row add_row power,
+  creates an offer, logs it, and returns a promise resolvable with the ID
+  of the new offer.
+*/
+const createOffer = (requester, call) => {
+  return dbPowers.hasRow(requester, 'add', 'offer', true)
+  .then(resultRow => {
+    if (resultRow.has_power) {
+      return dbQueries.insertAndGetID(requester, dbQueries.getInsertQuery(
+        'offer', [
+          call, requester, new Date().toUTCString(), null
+        ]
+      ));
+    }
+    else {
+      return false;
+    }
+  })
+  .catch(error => {
+    return error;
+  });
+};
+
+/*
+  Define a function that, if there is an authorizing own-row add_row power,
+  creates an assessment, logs it, and returns a promise resolvable with
+  the ID of the new assessment.
+*/
+const createAssessment = (requester, offer, rating, comment) => {
+  return dbPowers.hasRow(requester, 'add', 'assessment', true)
+  .then(resultRow => {
+    if (resultRow.has_power) {
+      return dbQueries.insertAndGetID(requester, dbQueries.getInsertQuery(
+        'assessment', [
+          offer, requester, rating, comment, new Date().toUTCString()
+        ]
+      ));
+    }
+    else {
+      return false;
+    }
+  })
+  .catch(error => {
+    return error;
+  });
+};
+
+module.exports = {
+  createAssessment, createCall, createLocation, createOffer, createRating
+};

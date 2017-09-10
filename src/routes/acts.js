@@ -51,27 +51,79 @@ router.post('/ratings', (request, response) => {
   });
 });
 
-// Handle requests to create requests.
-router.post('/ask', (request, response) => {
+// Handle requests to create calls.
+router.post('/call', (request, response) => {
   const {requester, skill, location, comment} = request.body;
-  actModel.createRequest(requester, skill, location, comment)
+  actModel.createCall(requester, skill, location, comment)
   .then(result => {
     if (typeof result === 'object') {
       response.send(
-        'Error (routes/acts/post/ask):\n'
+        'Error (routes/acts/post/call):\n'
         + `${result.message}\n${result.detail}\n`
       );
     }
     else {
       response.send(
         result
-          ? `Member ${requester} created request ${result} on skill ${skill}.\n`
-          : `Member ${requester} may not create requests.\n`
+          ? `Member ${requester} at location ${location} created `
+            + `call ${result} on skill ${skill}`
+            + `${comment ? ' (' + comment + ')' : ''}.\n`
+          : `Member ${requester} may not create calls.\n`
       );
     }
   })
   .catch(error => {
-    response.send('Error (routes/acts/post/ask):\n' + error + '\n');
+    response.send('Error (routes/acts/post/call):\n' + error + '\n');
+  });
+});
+
+// Handle requests to create offers.
+router.post('/offer', (request, response) => {
+  const {requester, call} = request.body;
+  actModel.createOffer(requester, call)
+  .then(result => {
+    if (typeof result === 'object') {
+      response.send(
+        'Error (routes/acts/post/offer):\n'
+        + `${result.message}\n${result.detail}\n`
+      );
+    }
+    else {
+      response.send(
+        result
+          ? `Member ${requester} created offer ${result} on call ${call}.\n`
+          : `Member ${requester} may not create offers.\n`
+      );
+    }
+  })
+  .catch(error => {
+    response.send('Error (routes/acts/post/offer):\n' + error + '\n');
+  });
+});
+
+// Handle requests to create assessments.
+router.post('/assess', (request, response) => {
+  const {requester, offer, rating, comment} = request.body;
+  actModel.createOffer(requester, offer, rating, comment)
+  .then(result => {
+    if (typeof result === 'object') {
+      response.send(
+        'Error (routes/acts/post/assess):\n'
+        + `${result.message}\n${result.detail}\n`
+      );
+    }
+    else {
+      response.send(
+        result
+          ? `Member ${requester} created assessment ${result} `
+            + `with rating ${rating} on offer ${offer}`
+            + `${comment ? ' (' + comment + ')' : ''}.\n`
+          : `Member ${requester} may not create assessments.\n`
+      );
+    }
+  })
+  .catch(error => {
+    response.send('Error (routes/acts/post/assess):\n' + error + '\n');
   });
 });
 

@@ -149,7 +149,7 @@ const schema = {
         nn: true
       }
     },
-    request: {
+    call: {
       id: {
         type: 'SERIAL',
         pk: true
@@ -177,8 +177,7 @@ const schema = {
         nn: true
       },
       ended: {
-        type: 'TIMESTAMPTZ',
-        nn: true
+        type: 'TIMESTAMPTZ'
       }
     },
     offer: {
@@ -186,9 +185,9 @@ const schema = {
         type: 'SERIAL',
         pk: true
       },
-      request: {
+      call: {
         type: 'INTEGER',
-        fk: 'request(id)',
+        fk: 'call(id)',
         nn: true
       },
       member: {
@@ -201,8 +200,7 @@ const schema = {
         nn: true
       },
       ended: {
-        type: 'TIMESTAMPTZ',
-        nn: true
+        type: 'TIMESTAMPTZ'
       }
     },
     assessment: {
@@ -249,7 +247,7 @@ const schema = {
       },
       genre: {
         type: 'INTEGER',
-        fk: 'class(id)',
+        fk: 'genre(id)',
         nn: true
       },
       content: {
@@ -326,15 +324,15 @@ const schema = {
       domain: 'subject categories to which skills belong',
       genre: 'types of log entries',
       kill_row: 'powers to delete rows from tables',
-      location: 'physical parts of site where requesters are working',
+      location: 'physical parts of site where callers are working',
       log: 'log of commands and other events',
       claim: 'members’ claims to have skills',
       member: 'persons in a community served by HelpShare',
-      offer: 'assertions by members of intent to provide requested help',
+      offer: 'assertions by members of intent to provide called-for help',
       phase: 'seniority categories to which members belong',
-      rating: 'categories to which assessments assign help requests',
+      rating: 'categories to which assessments assign help calls',
       relevance: 'skills’ pertinence to domains',
-      request: 'assertions by members of desire to receive help',
+      call: 'assertions by members of desire to receive help',
       read_col: 'powers to select columns from tables',
       role: 'privilege categories to which members belong',
       roleplay: 'members’ possessions of roles',

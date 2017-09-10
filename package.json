@@ -5,7 +5,7 @@
   "main": "./server.js",
   "scripts": {
     "db_drop": "dropdb -e --if-exists helpshare",
-    "db_reset": "dropdb -e --if-exists helpshare && createdb -ehelpshare",
+    "db_reset": "dropdb -e --if-exists helpshare && createdb -e helpshare",
     "schema_reset": "node -e \"require('./src/db/schema').installSchema()\"",
     "miniseed": "node -e \"require('./src/db/schema').miniseed()\"",
     "sampleseed": "source ./sampleseed.txt",
