@@ -64,7 +64,7 @@ router.post('/re', (request, response) => {
       response.send(
         result
           ? `Member ${requester} created relevance ${result}, `
-            + `assigning skill ${skill} to domain ${domain} (${description}).\n`
+            + `assigning skill ${skill} to domain ${domain}.\n`
           : `Member ${requester} may not create relevances.\n`
       );
     }
