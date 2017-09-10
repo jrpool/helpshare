@@ -133,7 +133,7 @@ const schema = {
         nn: true
       }
     },
-    mastery: {
+    claim: {
       id: {
         type: 'SERIAL',
         pk: true
@@ -311,7 +311,7 @@ const schema = {
   },
   uniques: {
     relevance: ['skill', 'domain'],
-    mastery: ['member', 'skill'],
+    claim: ['member', 'skill'],
     roleplay: ['member', 'role'],
     add_row: ['relation', 'role'],
     kill_row: ['relation', 'role'],
@@ -328,7 +328,7 @@ const schema = {
       kill_row: 'powers to delete rows from tables',
       location: 'physical parts of site where requesters are working',
       log: 'log of commands and other events',
-      mastery: 'members’ possessions of skills',
+      claim: 'members’ claims to have skills',
       member: 'persons in a community served by HelpShare',
       offer: 'assertions by members of intent to provide requested help',
       phase: 'seniority categories to which members belong',

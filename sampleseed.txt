@@ -8,7 +8,7 @@ curl http://localhost:3000/2/powers/row/add -d '{"table": "location", "role": 1}
 curl http://localhost:3000/2/powers/row/add -d '{"table": "rating", "role": 1}'
 curl http://localhost:3000/2/roles -d '{"description": "expert"}'
 curl http://localhost:3000/2/roles -d '{"description": "learner"}'
-curl http://localhost:3000/2/powers/row/add -d '{"table": "mastery"}'
+curl http://localhost:3000/2/powers/row/add -d '{"table": "claim"}'
 curl http://localhost:3000/2/powers/row/add -d '{"table": "request"}'
 curl http://localhost:3000/2/powers/row/add -d '{"table": "offer"}'
 curl http://localhost:3000/2/powers/row/add -d '{"table": "assessment"}'

@@ -74,4 +74,28 @@ router.post('/re', (request, response) => {
   });
 });
 
+// Handle requests to create skill claims.
+router.post('/claim', (request, response) => {
+  const {requester, skill} = request.body;
+  skillModel.createClaim(requester, skill)
+  .then(result => {
+    if (typeof result === 'object') {
+      response.send(
+        'Error (routes/skills/post/claim):\n'
+        + `${result.message}\n${result.detail}\n`
+      );
+    }
+    else {
+      response.send(
+        result
+          ? `Member ${requester} created claim ${result} on skill (${skill}).\n`
+          : `Member ${requester} may not create claims.\n`
+      );
+    }
+  })
+  .catch(error => {
+    response.send('Error (routes/skills/post/claim):\n' + error + '\n');
+  });
+});
+
 module.exports = router;
