@@ -210,9 +210,9 @@ const schema = {
         type: 'SERIAL',
         pk: true
       },
-      request: {
+      offer: {
         type: 'INTEGER',
-        fk: 'request(id)',
+        fk: 'offer(id)',
         nn: true
       },
       member: {
@@ -325,7 +325,7 @@ const schema = {
   comments: {
     table: {
       add_row: 'powers to insert rows into tables',
-      assessment: 'reports on help requests',
+      assessment: 'reports on help offers',
       domain: 'subject categories to which skills belong',
       genre: 'types of log entries',
       kill_row: 'powers to delete rows from tables',
