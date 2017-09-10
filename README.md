@@ -190,11 +190,11 @@ Make that parent directory your working directory, by executing, for example:
 
 7. To seed it with the minimal required data to permit the API to fulfill requests, execute `npm run miniseed`.
 
-8. After minimally seeding it, to further seed it with a sample of additional imaginary data, execute `npm run sampleseed`.
-
 8. To start the application, execute `npm start`.
 
-9. To access the API while it is running, issue HTTP requests to `http://localhost:3000` as specified below:
+9. After minimally seeding the database and starting the application, to further seed the database with a sample of additional imaginary data, execute `npm run sampleseed`.
+
+10. To access the API while it is running, issue HTTP requests to `http://localhost:3000` as specified below:
 
 | Method |         URL        |        Body properties [optional]       |
 | ------ | ------------------ | --------------------------------------- |
