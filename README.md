@@ -148,9 +148,9 @@ Future versions may include the following additional features:
 
 The above requirements are modeled in a database whose schema is summarized and diagrammed below.
 
-<p style='margin: 0 auto 0'><img src='summary.png' alt='members need skills, make help requests, and answer help requests'></p>
+<p align='center'><img src='summary.png' alt='members need skills, make help requests, and answer help requests'></p>
 
-<p style='margin: 0 auto 0'><img src='public/helpshare.png' alt='entity-relationship diagram for database'></p>
+<p align='center'><img src='public/helpshare.png' alt='entity-relationship diagram for database'></p>
 
 ### Project Origin
 
