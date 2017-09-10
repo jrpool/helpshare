@@ -98,4 +98,28 @@ router.post('/claim', (request, response) => {
   });
 });
 
+// Handle requests to create skill claims.
+router.delete('/claim', (request, response) => {
+  const {requester, claim} = request.body;
+  skillModel.deleteClaim(requester, claim)
+  .then(result => {
+    if (typeof result === 'object') {
+      response.send(
+        'Error (routes/skills/delete/claim):\n'
+        + `${result.message}\n${result.detail}\n`
+      );
+    }
+    else {
+      response.send(
+        result
+          ? `Member ${requester} deleted claim ${claim}.\n`
+          : `Member ${requester} may not delete claims.\n`
+      );
+    }
+  })
+  .catch(error => {
+    response.send('Error (routes/skills/delete/claim):\n' + error + '\n');
+  });
+});
+
 module.exports = router;

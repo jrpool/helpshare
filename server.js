@@ -1,7 +1,15 @@
 const app = require('express')();
 
-// Execute body-parser on every valid POST request.
+// Execute body-parser on every valid POST or DELETE request.
 app.post(
+  '/:requester/*',
+  require('body-parser').json({type: '*/*'}),
+  (request, response, next) => {
+    request.body.requester = request.params.requester;
+    next();
+  }
+);
+app.delete(
   '/:requester/*',
   require('body-parser').json({type: '*/*'}),
   (request, response, next) => {

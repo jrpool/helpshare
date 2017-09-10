@@ -89,4 +89,27 @@ const createClaim = (requester, skill) => {
   });
 };
 
-module.exports = {create, createClaim, createDomain, createRelevance};
+/*
+  Define a function that, if there is an authorizing own-row kill_row power,
+  deletes a claim, logs the deletion, and returns an empty string.
+*/
+const deleteClaim = (requester, claim) => {
+  return dbPowers.hasRow(requester, 'kill', 'claim', true)
+  .then(resultRow => {
+    if (resultRow.has_power) {
+      return dbQueries.delete(requester, dbQueries.getDeleteQuery(
+        'claim', [requester, claim]
+      ));
+    }
+    else {
+      return false;
+    }
+  })
+  .catch(error => {
+    return error;
+  });
+};
+
+module.exports = {
+  create, createClaim, createDomain, createRelevance, deleteClaim
+};

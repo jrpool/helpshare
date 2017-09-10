@@ -30,6 +30,22 @@ const getInsertQuery = (table, values) => {
 };
 
 /*
+  Define a function that returns a query deleting a row from a table.
+  Make the query return the count of deleted rows.
+*/
+const getDeleteQuery = (table, id) =>
+  `DELETE FROM ${table} WHERE id = ${id} RETURNING COUNT(*)`,
+      values
+    );
+  }
+  else {
+    const error = new Error('Wrong value count.');
+    error.detail = `${values.length}, but should be ${cols.length}.`;
+    throw error;
+  }
+};
+
+/*
   Define a function that submits an insertion query returning an ID, logs it,
   and returns a promise resolvable with that ID. The query may be a string
   or a parameterized query object.
