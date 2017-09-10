@@ -1,18 +1,27 @@
 const router = require('express').Router();
-const memberModel = require('../model/members');
+const skillModel = require('../model/skills');
 
-router.post('/', (request, response) => {
-  const {member, fullname, handle, phase, role} = request.body;
-  return memberModel.create(member, fullname, handle, phase, role)
-  .then(newID => {
-    response.send(
-      typeof newID === 'number'
-        ? `Member ${request.params.user} created new member ${fullname} with ID ${newID}.\n`
-        : 'Error creating a member.\n'
-    );
+// Handle requests to create locations.
+router.post('/domains', (request, response) => {
+  const {requester, description} = request.body;
+  skillModel.createDomain(requester, description)
+  .then(result => {
+    if (typeof result === 'object') {
+      response.send(
+        'Error (routes/skills/post/domains):\n'
+        + `${result.message}\n${result.detail}\n`
+      );
+    }
+    else {
+      response.send(
+        result
+          ? `Member ${requester} created domain ${result} (${description}).\n`
+          : `Member ${requester} may not create domains.\n`
+      );
+    }
   })
   .catch(error => {
-    response.send('Error: ' + error.message);
+    response.send('Error (routes/skills/post/domains):\n' + error + '\n');
   });
 });
 

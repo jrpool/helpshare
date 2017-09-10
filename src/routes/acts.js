@@ -1,18 +1,53 @@
-const router = require('express').Router();
-const memberModel = require('../model/members');
+// This module routes all act requests. Prefix: “/acts.
 
-router.post('/', (request, response) => {
-  const {member, fullname, handle, phase, role} = request.body;
-  return memberModel.create(member, fullname, handle, phase, role)
-  .then(newID => {
-    response.send(
-      typeof newID === 'number'
-        ? `Member ${request.params.user} created new member ${fullname} with ID ${newID}.\n`
-        : 'Error creating a member.\n'
-    );
+const router = require('express').Router();
+const actModel = require('../model/acts');
+
+// Handle requests to create locations.
+router.post('/locations', (request, response) => {
+  const {requester, description} = request.body;
+  actModel.createLocation(requester, description)
+  .then(result => {
+    if (typeof result === 'object') {
+      response.send(
+        'Error (routes/acts/post/locations):\n'
+        + `${result.message}\n${result.detail}\n`
+      );
+    }
+    else {
+      response.send(
+        result
+          ? `Member ${requester} created location ${result} (${description}).\n`
+          : `Member ${requester} may not create locations.\n`
+      );
+    }
   })
   .catch(error => {
-    response.send('Error: ' + error.message);
+    response.send('Error (routes/acts/post/locations):\n' + error + '\n');
+  });
+});
+
+// Handle requests to create ratings.
+router.post('/ratings', (request, response) => {
+  const {requester, description} = request.body;
+  actModel.createRating(requester, description)
+  .then(result => {
+    if (typeof result === 'object') {
+      response.send(
+        'Error (routes/acts/post/ratings):\n'
+        + `${result.message}\n${result.detail}\n`
+      );
+    }
+    else {
+      response.send(
+        result
+          ? `Member ${requester} created rating ${result} (${description}).\n`
+          : `Member ${requester} may not create ratings.\n`
+      );
+    }
+  })
+  .catch(error => {
+    response.send('Error (routes/acts/post/ratings):\n' + error + '\n');
   });
 });
 
