@@ -259,6 +259,10 @@ const schema = {
       }
     },
     add_row: {
+      id: {
+        type: 'SERIAL',
+        pk: true
+      },
       relation: {
         type: 'TEXT',
         nn: true
@@ -269,6 +273,10 @@ const schema = {
       }
     },
     kill_row: {
+      id: {
+        type: 'SERIAL',
+        pk: true
+      },
       relation: {
         type: 'TEXT',
         nn: true
@@ -279,6 +287,10 @@ const schema = {
       }
     },
     change_col: {
+      id: {
+        type: 'SERIAL',
+        pk: true
+      },
       relation: {
         type: 'TEXT',
         nn: true
@@ -293,6 +305,10 @@ const schema = {
       }
     },
     read_col: {
+      id: {
+        type: 'SERIAL',
+        pk: true
+      },
       relation: {
         type: 'TEXT',
         nn: true
@@ -314,7 +330,7 @@ const schema = {
     add_row: ['relation', 'role'],
     kill_row: ['relation', 'role'],
     change_col: ['relation', 'col', 'role'],
-    read_col: ['relation', 'role'],
+    read_col: ['relation', 'col', 'role'],
   },
   comments: {
     table: {

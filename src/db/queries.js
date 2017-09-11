@@ -1,56 +1,36 @@
 const db = require('./db').db;
 const log = require('./log');
 const PQ = require('pg-promise').ParameterizedQuery;
-const schema = require('./schema').getSchema();
 
 /*
-  Define a function that returns a query inserting values into a table.
-  Require the count of values to be equal to the count of non-ID columns
-  and assume they are given in the table’s column order. Make the query
-  return the ID of the inserted row, if the table has an ID column, or
-  otherwise return nothing.
+  Define a function that returns a query inserting a row into a table and
+  returning the ID of the new row.
 */
-const getInsertQuery = (table, values) => {
-  const allCols = Object.keys(schema.tables[table]);
-  const cols = allCols.filter(value => value !== 'id');
-  if (values.length === cols.length) {
-    const colList = cols.join(', ');
-    const paramList = cols.map((v, index) => `$${index + 1}`).join(', ');
-    const returnClause = allCols.includes('id') ? ' RETURNING id' : '';
-    return new PQ(
-      `INSERT INTO ${table} (${colList}) VALUES (${paramList})${returnClause}`,
-      values
-    );
-  }
-  else {
-    const error = new Error('Wrong value count.');
-    error.detail = `${values.length}, but should be ${cols.length}.`;
-    throw error;
-  }
+const getInsertQuery = (table, args) => {
+  const cols = Object.keys(args);
+  const vals = cols.map(col => args[col]);
+  const colList = cols.join(', ');
+  const paramList = cols.map((v, index) => `$${index + 1}`).join(', ');
+  return new PQ(
+    `INSERT INTO ${table} (${colList}) VALUES (${paramList}) RETURNING id`,
+    vals
+  );
 };
 
 /*
-  Define a function that returns a query deleting a row from a table.
-  Make the query return the count of deleted rows.
+  Define a function that returns a query deleting a row from a table and
+  returning 1 if deleted or 0 if not.
 */
-const getDeleteQuery = (table, id) =>
-  `DELETE FROM ${table} WHERE id = ${id} RETURNING COUNT(*)`,
-      values
-    );
-  }
-  else {
-    const error = new Error('Wrong value count.');
-    error.detail = `${values.length}, but should be ${cols.length}.`;
-    throw error;
-  }
-};
+const getDeleteQuery = (table, id) => new PQ(
+  `DELETE FROM ${table} WHERE id = $1 RETURNING id`, [id]
+);
 
 /*
   Define a function that submits an insertion query returning an ID, logs it,
   and returns a promise resolvable with that ID. The query may be a string
   or a parameterized query object.
 */
-const insertAndGetID = (requester, query) => {
+const insert = (requester, query) => {
   return db.task(context => {
     return context.one(query)
     .then(idRow => {
@@ -64,19 +44,21 @@ const insertAndGetID = (requester, query) => {
 };
 
 /*
-  Define a function that submits an insertion query returning nothing,
-  logs it, and returns a promise resolvable with true. The query may be
-  a string or a parameterized query object.
+  Define a function that submits a deletion query, logs it, and returns
+  a promise resolvable with the query result. The query may be a string
+  or a parameterized query object.
 */
-const insert = (requester, query) => {
+const del = (requester, query) => {
   return db.task(context => {
-    return context.none(query)
-    .then(() => {
-      return context.none(log.getQueryQuery(requester, query));
+    return context.any(query)
+    .then(resultRows => {
+      return context.none(log.getQueryQuery(requester, query))
+      .then(() => resultRows);
     });
   })
-  .then(() => true)
-  .catch(error => error);
+  .catch(error => {
+    return error;
+  });
 };
 
-module.exports = {insertAndGetID, getInsertQuery, insert};
+module.exports = {del, getDeleteQuery, getInsertQuery, insert};

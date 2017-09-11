@@ -1,10 +1,12 @@
+// This module routes all role requests. Prefix: “/roles”.
+
 const router = require('express').Router();
-const roleModel = require('../model/roles');
+const modelQueries = require('../model/queries');
 
 // Handle requests to create roles.
 router.post('/', (request, response) => {
   const {requester, description} = request.body;
-  roleModel.create(requester, description)
+  modelQueries.create(requester, 'role', false, {description})
   .then(result => {
     if (typeof result === 'object') {
       response.send(
@@ -28,7 +30,7 @@ router.post('/', (request, response) => {
 // Handle requests to create roleplays.
 router.post('/grant', (request, response) => {
   const {requester, member, role} = request.body;
-  roleModel.grant(requester, member, role)
+  modelQueries.create(requester, 'roleplay', false, {member, role})
   .then(result => {
     if (typeof result === 'object') {
       response.send(

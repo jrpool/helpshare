@@ -1,13 +1,15 @@
 // This module routes all power requests. Prefix: “/powers”.
 
 const router = require('express').Router();
-const powerModel = require('../model/powers');
+const modelQueries = require('../model/queries');
 
 // Handle requests to create column powers (i.e. “change” or “read”).
 router.post('/col/:power(change|read)', (request, response) => {
   const power = request.params.power;
   const {requester, table, col, role} = request.body;
-  powerModel.colCreate(requester, power, table, col, role)
+  modelQueries.create(
+    requester, `${power}_col`, false, {relation: table, col, role}
+  )
   .then(result => {
     if (typeof result === 'object') {
       response.send(
@@ -42,7 +44,7 @@ router.post('/col/:power(change|read)', (request, response) => {
 router.post('/row/:power(add|kill)', (request, response) => {
   const power = request.params.power;
   const {requester, table, role} = request.body;
-  powerModel.rowCreate(requester, power, table, role)
+  modelQueries.create(requester, `${power}_row`, false, {relation: table, role})
   .then(result => {
     if (typeof result === 'object') {
       response.send(

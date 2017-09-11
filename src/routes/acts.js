@@ -1,12 +1,12 @@
 // This module routes all act requests. Prefix: “/acts.
 
 const router = require('express').Router();
-const actModel = require('../model/acts');
+const modelQueries = require('../model/queries');
 
 // Handle requests to create locations.
 router.post('/locations', (request, response) => {
   const {requester, description} = request.body;
-  actModel.createLocation(requester, description)
+  modelQueries.create(requester, 'location', false, {description})
   .then(result => {
     if (typeof result === 'object') {
       response.send(
@@ -30,7 +30,7 @@ router.post('/locations', (request, response) => {
 // Handle requests to create ratings.
 router.post('/ratings', (request, response) => {
   const {requester, description} = request.body;
-  actModel.createRating(requester, description)
+  modelQueries.create(requester, 'rating', false, {description})
   .then(result => {
     if (typeof result === 'object') {
       response.send(
@@ -54,7 +54,10 @@ router.post('/ratings', (request, response) => {
 // Handle requests to create calls.
 router.post('/call', (request, response) => {
   const {requester, skill, location, comment} = request.body;
-  actModel.createCall(requester, skill, location, comment)
+  modelQueries.create(requester, 'call', true, {
+    skill, member: requester, location, comment,
+    started: new Date().toUTCString()
+  })
   .then(result => {
     if (typeof result === 'object') {
       response.send(
@@ -80,7 +83,9 @@ router.post('/call', (request, response) => {
 // Handle requests to create offers.
 router.post('/offer', (request, response) => {
   const {requester, call} = request.body;
-  actModel.createOffer(requester, call)
+  modelQueries.create(requester, 'offer', true, {
+    call, member: requester, started: new Date().toUTCString()
+  })
   .then(result => {
     if (typeof result === 'object') {
       response.send(
@@ -104,7 +109,9 @@ router.post('/offer', (request, response) => {
 // Handle requests to create assessments.
 router.post('/assess', (request, response) => {
   const {requester, offer, rating, comment} = request.body;
-  actModel.createOffer(requester, offer, rating, comment)
+  modelQueries.create(requester, 'assessment', true, {
+    offer, rating, member: requester, comment, time: new Date().toUTCString()
+  })
   .then(result => {
     if (typeof result === 'object') {
       response.send(
