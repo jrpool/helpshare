@@ -6,7 +6,7 @@ const modelQueries = require('../model/queries');
 // Handle requests to create roles.
 router.post('/', (request, response) => {
   const {requester, description} = request.body;
-  modelQueries.create(requester, 'role', false, {description})
+  modelQueries.createOne(requester, 'role', false, {description})
   .then(result => {
     if (typeof result === 'object') {
       response.send(
@@ -30,7 +30,7 @@ router.post('/', (request, response) => {
 // Handle requests to create roleplays.
 router.post('/grant', (request, response) => {
   const {requester, member, role} = request.body;
-  modelQueries.create(requester, 'roleplay', false, {member, role})
+  modelQueries.createOne(requester, 'roleplay', false, {member, role})
   .then(result => {
     if (typeof result === 'object') {
       response.send(

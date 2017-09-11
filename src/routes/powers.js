@@ -7,7 +7,7 @@ const modelQueries = require('../model/queries');
 router.post('/col/:power(change|read)', (request, response) => {
   const power = request.params.power;
   const {requester, table, col, role} = request.body;
-  modelQueries.create(
+  modelQueries.createOne(
     requester, `${power}_col`, false, {relation: table, col, role}
   )
   .then(result => {
@@ -44,7 +44,7 @@ router.post('/col/:power(change|read)', (request, response) => {
 router.post('/row/:power(add|kill)', (request, response) => {
   const power = request.params.power;
   const {requester, table, role} = request.body;
-  modelQueries.create(requester, `${power}_row`, false, {relation: table, role})
+  modelQueries.createOne(requester, `${power}_row`, false, {relation: table, role})
   .then(result => {
     if (typeof result === 'object') {
       response.send(

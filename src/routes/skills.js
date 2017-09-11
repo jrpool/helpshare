@@ -6,7 +6,7 @@ const modelQueries = require('../model/queries');
 // Handle requests to create skills.
 router.post('/', (request, response) => {
   const {requester, description} = request.body;
-  modelQueries.create(requester, 'skill', false, {description})
+  modelQueries.createOne(requester, 'skill', false, {description})
   .then(result => {
     if (typeof result === 'object') {
       response.send(
@@ -30,7 +30,7 @@ router.post('/', (request, response) => {
 // Handle requests to create domains.
 router.post('/domains', (request, response) => {
   const {requester, description} = request.body;
-  modelQueries.create(requester, 'domain', false, {description})
+  modelQueries.createOne(requester, 'domain', false, {description})
   .then(result => {
     if (typeof result === 'object') {
       response.send(
@@ -54,7 +54,7 @@ router.post('/domains', (request, response) => {
 // Handle requests to create relevances.
 router.post('/re', (request, response) => {
   const {requester, skill, domain} = request.body;
-  modelQueries.create(requester, 'relevance', false, {skill, domain})
+  modelQueries.createOne(requester, 'relevance', false, {skill, domain})
   .then(result => {
     if (typeof result === 'object') {
       response.send(
@@ -79,7 +79,7 @@ router.post('/re', (request, response) => {
 // Handle requests to create claims.
 router.post('/claim', (request, response) => {
   const {requester, skill} = request.body;
-  modelQueries.create(requester, 'claim', true, {member: requester, skill})
+  modelQueries.createOne(requester, 'claim', true, {member: requester, skill})
   .then(result => {
     if (typeof result === 'object') {
       response.send(
@@ -103,7 +103,7 @@ router.post('/claim', (request, response) => {
 // Handle requests to delete claims.
 router.delete('/claim', (request, response) => {
   const {requester, id} = request.body;
-  modelQueries.del(requester, 'claim', true, id)
+  modelQueries.deleteOne(requester, 'claim', true, id)
   .then(resultRows => {
     if (Array.isArray(resultRows)) {
       response.send(

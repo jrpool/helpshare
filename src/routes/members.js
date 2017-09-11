@@ -6,7 +6,7 @@ const modelQueries = require('../model/queries');
 // Handle requests to create members.
 router.post('/', (request, response) => {
   const {requester, fullname, handle, phase} = request.body;
-  modelQueries.create(requester, 'member', false, {fullname, handle, phase})
+  modelQueries.createOne(requester, 'member', false, {fullname, handle, phase})
   .then(result => {
     if (typeof result === 'object') {
       response.send(
@@ -30,7 +30,7 @@ router.post('/', (request, response) => {
 // Handle requests to create phases.
 router.post('/phases', (request, response) => {
   const {requester, description} = request.body;
-  modelQueries.create(requester, 'phase', false, {description})
+  modelQueries.createOne(requester, 'phase', false, {description})
   .then(result => {
     if (typeof result === 'object') {
       response.send(

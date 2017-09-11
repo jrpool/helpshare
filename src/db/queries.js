@@ -4,7 +4,7 @@ const PQ = require('pg-promise').ParameterizedQuery;
 
 /*
   Define a function that returns a query inserting a row into a table and
-  returning the ID of the new row.
+  returning an array of row objects containing the IDs of the new rows.
 */
 const getInsertQuery = (table, args) => {
   const cols = Object.keys(args);
@@ -19,18 +19,30 @@ const getInsertQuery = (table, args) => {
 
 /*
   Define a function that returns a query deleting a row from a table and
-  returning 1 if deleted or 0 if not.
+  returning an array of row objects containing the IDs of the deleted rows.
 */
 const getDeleteQuery = (table, id) => new PQ(
   `DELETE FROM ${table} WHERE id = $1 RETURNING id`, [id]
 );
 
 /*
-  Define a function that submits an insertion query returning an ID, logs it,
-  and returns a promise resolvable with that ID. The query may be a string
-  or a parameterized query object.
+  Define a function that returns a query updating a column of a row in a
+  table and returning an array of row objects containing the IDs of the
+  updated rows.
 */
-const insert = (requester, query) => {
+const getUpdateQuery = (table, row, col, value) => {
+  return new PQ(
+    `UPDATE ${table} SET ${col} = $1 WHERE id = $2 RETURNING id`,
+    [value, id]
+  );
+};
+
+/*
+  Define a function that submits a query, logs it, and returns a promise resolvable with the ID of the affected row, or rejectable with a reason
+  if the count of affected rows is not 1. The query may be a string or a
+  parameterized query object.
+*/
+const submit = (requester, query) => {
   return db.task(context => {
     return context.one(query)
     .then(idRow => {
@@ -43,22 +55,6 @@ const insert = (requester, query) => {
   });
 };
 
-/*
-  Define a function that submits a deletion query, logs it, and returns
-  a promise resolvable with the query result. The query may be a string
-  or a parameterized query object.
-*/
-const del = (requester, query) => {
-  return db.task(context => {
-    return context.any(query)
-    .then(resultRows => {
-      return context.none(log.getQueryQuery(requester, query))
-      .then(() => resultRows);
-    });
-  })
-  .catch(error => {
-    return error;
-  });
+module.exports = {
+  getDeleteQuery, getInsertQuery, getUpdateQuery, submit
 };
-
-module.exports = {del, getDeleteQuery, getInsertQuery, insert};
