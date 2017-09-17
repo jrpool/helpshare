@@ -32,7 +32,7 @@ const deleteOne = (requester, thing, own, id) => {
   return dbPowers.hasRow(requester, 'kill', thing, own)
   .then(resultRow => {
     if (resultRow.has_power) {
-      return dbQueries.submit(requester, dbQueries.getDelQuery(thing, id));
+      return dbQueries.submit(requester, dbQueries.getDeleteQuery(thing, id));
     }
     else {
       return false;
@@ -46,7 +46,7 @@ const deleteOne = (requester, thing, own, id) => {
 /*
   Define a function that, if there is an authorizing change_col power,
   changes the value of a property of a thing, logs the change, and returns
-  a promise resolvable with the ID of the new thing, or, if not, with false.
+  a promise resolvable with the ID of the thing, or, if not, with false.
 */
 const changeOne = (requester, thing, own, id, property, value) => {
   return dbPowers.hasCol(requester, 'change', thing, property, own)

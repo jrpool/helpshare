@@ -6,142 +6,43 @@ Database-backed API supporting cooperative help management.
 
 [Jonathan Pool](https://github.com/jrpool)
 
-## Discussion
+## Use Case
 
-### Requirement Summary
+This application addresses the following imaginary use case:
 
-This application addresses the following imaginary requirements:
+Our on-site community has about 100 members, identified by name and unique handle. Each member has at least 1 role, drawn from the set {learner, expert, manager}. Learners are also in 1 of 5 phases {1, 2, 3, 4, 5}.
 
-Our on-site community has about 100 members. Each member has at least 1 role. Members in the learner role (“learners”) are also in 1 of 5 phases.
+Members seek to master skills, drawn from a set of about 400. Each skill is in at least 1 domain, drawn from a set of about 30.
 
-Learners seek to master about 400 skills. Each skill is in at least 1 domain.
+A member can claim competence in any skill and can also withdraw any claim.
 
-By design, all learners both learn and help others learn. Members can request help and respond to requests by offering help.
+A member can call for help on any skill. A call includes the skill on which help is sought, the current location of the member, and optionally a comment.
 
-An application that supports the efficient matching of requests and offers and collects data on the learning and helping processes may make the community more effective.
+A member can respond to any call with an offer of help.
 
-### Requirement Details
+The transaction arising from any call and any offer responding to that call can be assessed. The assessment includes a rating, drawn from a set of permitted ratings, and optionally a comment.
 
-Version 0 will be an API only. It will make the following things true:
+Powers to create, delete, update, and read things are granted in two ways. In a grant by role, they are granted to all members with a specified role. In a grant by relation, they are granted to any member with respect to things specific to that member.
 
-0. Members with role “manager” can add and amend members, phases, and roles.
+Events (calls, offers, and assessments) have timestamps. Calls and offers can be closed, and when closed they acquire timestamps indicating when closed.
 
-1. Members with role “expert” can add and amend skills and domains.
+Changes to records are logged. Log entries indicate which members caused the changes, what the changes were, and when they took place.
 
-2. Learners can add and delete claims that they have mastered skills.
+The application will include a service and application and user interfaces to it. The initial installment (“version 0”) will consist solely of an API. Each request to the API must identify the member making the request. In version 0, the API may trust the request, including its identification of its maker, to be authentic.
 
-3. Learners can open and close help requests. Each request specifies the skill on which help is requested and the learner’s location on the site. Members with role “manager” can add and amend locations. Each request optionally also includes a comment. Its maker can amend a request’s location and/or its comment.
+## Future Use Cases
 
-4. Members other than makers of requests can open and close help offers for requests while open. The closing of a request closes all open offers for it.
-
-5. Members can create and amend assessments of offers (and thus of the requests for that the offers are for). Each assessment contains a rating and optionally a comment. Members with role “manager” can add and amend permitted ratings.
-
-6. Events are logged.
-
-7. All members can see the following facts:
-
-```
-I. ENTITIES
-
-A. Members:
-a. ID.
-b. Name.
-c. Handle.
-d. Phase.
-
-B. Phases:
-a. ID.
-b. Description.
-
-C. Roles:
-a. ID.
-b. Description.
-
-D. Skills:
-a. ID.
-b. Description.
-
-E. Domains:
-a. ID.
-b. Description.
-
-F. Roleplays:
-a. ID.
-b. Member.
-c. Role.
-
-F. Masteries:
-a. ID.
-b. Member.
-c. Skill.
-
-F. Relevances:
-a. ID.
-b. Skill.
-c. Domain.
-
-G. Locations:
-a. ID.
-b. Description.
-
-H. Ratings:
-a. ID.
-b. Description.
-
-II. EVENTS
-
-A. Requests:
-a. ID.
-b. Skill.
-c. Member.
-d. Location.
-e. Comment.
-f. When opened.
-g. When closed.
-
-B. Offers:
-a. ID.
-b. Request.
-c. Maker.
-d. When opened.
-e. When closed.
-
-C. Assessments:
-a. ID.
-b. Offer.
-c. Assessor.
-d. Rating.
-e. Comment.
-
-D. Event log:
-a. ID.
-b. When occurred.
-c. Maker.
-d. Genre.
-e. Content.
-f. Addendum.
-
-III. OPTIONAL REPORTS
-
-Reports combining and summarizing the above facts.
-```
-
-8. Each request to the API identifies a member as the maker of the request. The API trusts the authenticity of that member.
-
-### Future Requirements
-
-Future versions may include the following additional features:
+Future versions may be required to include the following additional features:
 
 ```
 - A web interface to the API.
 - Authentication of requests.
-- Notifications to members who have mastered skills for which help requests have been opened.
+- Notifications to members who have skills that other members call for help on.
 - Suspension of help requests during times when requesters are unavailable.
 - Implementation of an on-call role.
 - Addition of modules (study units) as entities, with associated skills.
 - Addition of member groups as entities capable of making help requests.
 - Automatic termination of requests determined to be stale.
-- Role-based limitations of visibilities of some facts and events.
 ```
 
 ## Implementation
@@ -152,7 +53,7 @@ The above requirements are modeled in a database whose schema is summarized and 
 
 <p align='center'><img src='public/helpshare.png' alt='entity-relationship diagram for database'></p>
 
-### Project Origin
+## Project Origin
 
 This application was created in fulfillment of the requirements of the “Pizza Restaurant: RDB Schema with CRUD API” module (Module 98) in Phase 3 of the [Learners Guild][lg] curriculum.
 
@@ -196,7 +97,7 @@ Make that parent directory your working directory, by executing, for example:
 
 10. To access the API while it is running, issue HTTP requests to `http://localhost:3000` as specified below:
 
-| Method |         URL        |        Body properties [optional]       |
+| Method |         URL        | Required and [optional] body properties |
 | ------ | ------------------ | --------------------------------------- |
 | POST   | `/members`         | `fullname`, `handle`, `[phase]`         |
 | POST   | `/roles/grant`     | `member`, `role`                        |

@@ -33,7 +33,7 @@ const getDeleteQuery = (table, id) => new PQ(
 const getUpdateQuery = (table, row, col, value) => {
   return new PQ(
     `UPDATE ${table} SET ${col} = $1 WHERE id = $2 RETURNING id`,
-    [value, id]
+    [value, row]
   );
 };
 

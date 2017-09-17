@@ -51,4 +51,32 @@ router.post('/phases', (request, response) => {
   });
 });
 
+// Handle requests to change members’ properties.
+router.put('/:property(fullname|handle|phase)', (request, response) => {
+  const property = request.params.property;
+  const {requester, member, newValue} = request.body;
+  modelQueries.changeOne(
+    requester, 'member', true, member, property, newValue
+  )
+  .then(result => {
+    if (typeof result === 'object') {
+      response.send(
+        `Error (routes/members/put/${property}):\n`
+        + `${result.message}\n${result.detail}\n`
+      );
+    }
+    else {
+      response.send(
+        result
+          ? `Member ${requester} set the ${property} of member ${result} `
+            + `to ${newValue}.\n`
+          : `Member ${requester} may not assign members to phases.\n`
+      );
+    }
+  })
+  .catch(error => {
+    response.send(`Error (routes/members/put/${property}):\n${error}\n`);
+  });
+});
+
 module.exports = router;

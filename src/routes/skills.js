@@ -104,21 +104,18 @@ router.post('/claim', (request, response) => {
 router.delete('/claim', (request, response) => {
   const {requester, id} = request.body;
   modelQueries.deleteOne(requester, 'claim', true, id)
-  .then(resultRows => {
-    if (Array.isArray(resultRows)) {
-      response.send(
-        resultRows.length
-          ? `Member ${requester} deleted claim ${id}.\n`
-          : `Claim ${id} not found, so not deleted.\n`
-      )
+  .then(resultRow => {
+    if (resultRow) {
+      response.send(`Member ${requester} deleted claim ${id}.\n`);
     }
-    else if (resultRows === false) {
+    else if (resultRow === false) {
       response.send(`Member ${requester} may not delete claims.\n`);
     }
-    else if (typeof resultRows === 'object') {
+    else if (typeof resultRow === 'object') {
       response.send(
         'Error (routes/skills/delete/claim):\n'
-        + `${result.message}\n${result.detail ? '\n' + result.detail : ''}\n`
+        + `${resultRows.message}\n`
+        + `${resultRows.detail ? '\n' + resultRows.detail : ''}\n`
       );
     }
     else {
