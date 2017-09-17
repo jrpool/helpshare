@@ -258,115 +258,69 @@ const schema = {
         type: 'TEXT'
       }
     },
-    add_row: {
+    action: {
       id: {
         type: 'SERIAL',
         pk: true
       },
-      relation: {
+      description: {
+        type: 'TEXT',
+        unique: true,
+        nn: true
+      }
+    },
+    power: {
+      id: {
+        type: 'SERIAL',
+        pk: true
+      },
+      action: {
+        type: 'INTEGER',
+        fk: 'action(id)',
+        nn: true
+      },
+      object: {
         type: 'TEXT',
         nn: true
+      },
+      property: {
+        type: 'TEXT'
       },
       role: {
         type: 'INTEGER',
         fk: 'role(id)'
       }
-    },
-    kill_row: {
-      id: {
-        type: 'SERIAL',
-        pk: true
-      },
-      relation: {
-        type: 'TEXT',
-        nn: true
-      },
-      role: {
-        type: 'INTEGER',
-        fk: 'role(id)'
-      }
-    },
-    change_col: {
-      id: {
-        type: 'SERIAL',
-        pk: true
-      },
-      relation: {
-        type: 'TEXT',
-        nn: true
-      },
-      col: {
-        type: 'TEXT',
-        nn: true
-      },
-      role: {
-        type: 'INTEGER',
-        fk: 'role(id)'
-      }
-    },
-    read_col: {
-      id: {
-        type: 'SERIAL',
-        pk: true
-      },
-      relation: {
-        type: 'TEXT',
-        nn: true
-      },
-      col: {
-        type: 'TEXT',
-        nn: true
-      },
-      role: {
-        type: 'INTEGER',
-        fk: 'role(id)'
-      }
-    },
+    }
   },
   uniques: {
     relevance: ['skill', 'domain'],
     claim: ['member', 'skill'],
     roleplay: ['member', 'role'],
-    add_row: ['relation', 'role'],
-    kill_row: ['relation', 'role'],
-    change_col: ['relation', 'col', 'role'],
-    read_col: ['relation', 'col', 'role'],
+    power: ['action', 'object', 'property', 'role']
   },
   comments: {
     table: {
-      add_row: 'powers to insert rows into tables',
+      action: 'actions that powers permit',
       assessment: 'reports on help offers',
-      change_col: 'powers to update columns of tables',
       domain: 'subject categories to which skills belong',
       genre: 'types of log entries',
-      kill_row: 'powers to delete rows from tables',
       location: 'physical parts of site where callers are working',
       log: 'log of commands and other events',
       claim: 'members’ claims to have skills',
       member: 'persons in a community served by HelpShare',
       offer: 'assertions by members of intent to provide called-for help',
       phase: 'seniority categories to which members belong',
+      power: 'powers to act on records and properties',
       rating: 'categories to which assessments assign help calls',
       relevance: 'skills’ pertinence to domains',
       call: 'assertions by members of desire to receive help',
-      read_col: 'powers to select columns from tables',
       role: 'privilege categories to which members belong',
       roleplay: 'members’ possessions of roles',
       skill: 'item of knowledge'
-
     },
     column: {
-      add_row: {
-        role: 'empowered role, or null if members may add own rows'
-      },
       assessment: {
         member: 'member making the assessment'
-      },
-      change_col: {
-        role: 'empowered role, or null if members may update own rows’ column'
-      },
-      kill_row: {
-        role: 'empowered role, or null if members may delete own rows'
       },
       log: {
         member: 'member issuing the command or taking the action',
@@ -377,8 +331,10 @@ const schema = {
       offer: {
         member: 'member making the offer'
       },
-      read_col: {
-        role: 'empowered role, or null if members may select own rows’ column'
+      power: {
+        object: 'table that is the permitted target of the action',
+        property: 'column to which the action is limited, or all if null'
+        role: 'empowered role, or members may act on their own records if null'
       }
     }
   }
@@ -491,7 +447,8 @@ const getMiniseedQueries = () => {
     role: [['description'], ['manager']],
     roleplay: [['member', 'role'], [1, 1]],
     genre: [['description'], ['query']],
-    add_row: [['relation', 'role'], ['add_row', 1]]
+    action: [['description'], ['insert']],
+    power: [['action', 'object', 'role'], [1, 'power', 1]]
   };
   return Object.keys(specs).map(table => {
     const colList = specs[table][0].join(', ');
