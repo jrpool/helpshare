@@ -10,17 +10,13 @@ const compact = string => string.replace(/[\n ]+/g, ' ');
     0. The genre for query log entries has ID 1.
     1. query is either a string or a parameterizedQuery object.
 */
-const getQueryQuery = (member, query) => {
+const getQuery = (member, query) => {
   const text
-    = 'INSERT INTO log VALUES (DEFAULT, CURRENT_TIMESTAMP, $1, 1, $2, $3)';
+    = 'INSERT INTO log VALUES (DEFAULT, CURRENT_TIMESTAMP, $1, $2, $3)';
   const values = typeof query === 'string'
     ? [member, compact(query), null]
-    : [
-      member,
-      compact(query.text),
-      JSON.stringify(query.values)
-    ];
+    : [member, compact(query.text), JSON.stringify(query.values)];
   return new PQ(text, values);
 };
 
-module.exports = {getQueryQuery};
+module.exports = {getQuery};

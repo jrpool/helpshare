@@ -48,7 +48,7 @@ const submit = (requester, query) => {
   return db.task(context => {
     return context.one(query)
     .then(idRow => {
-      return context.none(log.getQueryQuery(requester, query))
+      return context.none(log.getQuery(requester, query))
       .then(() => idRow.id);
     });
   })

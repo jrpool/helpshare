@@ -7,8 +7,8 @@ const dbPowers = require('../db/powers');
   authorizing power, or returns a promise rejectable with false if there
   is not.
 */
-const createObject = (requester, object, isOwn, args) => {
-  return dbPowers.hasRow(requester, 'insert', object, isOwn)
+const _create = (requester, object, args) => {
+  return dbPowers._insert(requester, object, args)
   .then(resultRow => {
     if (resultRow.has_power) {
       return dbQueries.submit(
@@ -30,8 +30,8 @@ const createObject = (requester, object, isOwn, args) => {
   authorizing power, or returns a promise rejectable with false if there
   is not.
 */
-const deleteObject = (requester, object, isOwn, id) => {
-  return dbPowers.hasRow(requester, 'delete', object, isOwn)
+const _delete = (requester, object, id) => {
+  return dbPowers._delete(requester, object, id)
   .then(resultRow => {
     if (resultRow.has_power) {
       return dbQueries.submit(requester, dbQueries.getDeleteQuery(object, id));
@@ -51,8 +51,8 @@ const deleteObject = (requester, object, isOwn, id) => {
   there is an authorizing power, or returns a promise rejectable with
   false if there is not.
 */
-const updateProperty = (requester, object, isOwn, id, property, value) => {
-  return dbPowers.hasCol(requester, 'update', object, property, isOwn)
+const _update = (requester, object, id, property, value) => {
+  return dbPowers._update(requester, object, property, id)
   .then(resultRow => {
     if (resultRow.has_power) {
       return dbQueries.submit(
@@ -68,4 +68,4 @@ const updateProperty = (requester, object, isOwn, id, property, value) => {
   });
 };
 
-module.exports = {createObject, deleteObject, updateProperty};
+module.exports = {_create, _delete, _update};

@@ -163,6 +163,7 @@ const schema = {
       },
       started: {
         type: 'TIMESTAMPTZ',
+        default: 'CURRENT_TIMESTAMP',
         nn: true
       },
       ended: {
@@ -186,6 +187,7 @@ const schema = {
       },
       started: {
         type: 'TIMESTAMPTZ',
+        default: 'CURRENT_TIMESTAMP',
         nn: true
       },
       ended: {
@@ -217,6 +219,7 @@ const schema = {
       },
       time: {
         type: 'TIMESTAMPTZ',
+        default: 'CURRENT_TIMESTAMP',
         nn: true
       }
     },
@@ -227,6 +230,7 @@ const schema = {
       },
       time: {
         type: 'TIMESTAMPTZ',
+        default: 'CURRENT_TIMESTAMP',
         nn: true
       },
       member: {
@@ -378,6 +382,7 @@ const getInstallQueries = schema => {
         colName + ' ' + col.type
         + (col.pk ? ' PRIMARY KEY' : '')
         + (col.unique ? ' UNIQUE' : '')
+        + (col.default ? ' DEFAULT ' + col.default : '')
         + (
           col.fk
             ? ' REFERENCES ' + col.fk + ' DEFERRABLE INITIALLY DEFERRED'
@@ -430,6 +435,9 @@ const getMiniseedQueries = () => {
     role: [['description'], ['manager']],
     badge: [['member', 'role'], [1, 1]],
     action: [['description'], ['insert']],
+    action: [['description'], ['delete']],
+    action: [['description'], ['update']],
+    action: [['description'], ['select']],
     power: [['action', 'object', 'role'], [1, 'power', 1]]
   };
   return Object.keys(specs).map(table => {

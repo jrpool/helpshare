@@ -1,37 +1,31 @@
 const modelQueries = require('../model/queries');
 
 /*
-  Define a function that handles the creation of a member and returns
-  a promise resolvable with the new member’s ID if the requester is
-  authorized to create a member, or returns a promise rejectable with false
-  if not.
+  Define a function that handles the creation of an offer and returns a promise
+  resolvable with the new offer’s ID if the requester is authorized to create
+  an offer, or returns a promise rejectable with false if not.
 */
-const _create = (requester, fullname, handle, phase) => {
-  return modelQueries.createObject(
-    requester, 'member', false, {fullname, handle, phase}
-  );
+const _create = (requester, call, member) => {
+  return modelQueries._create(requester, 'offer', {call, member});
 };
 
 /*
-  Define a function that handles the deletion of a member and returns
-  a promise resolvable with the deleted member’s ID if the requester is
-  authorized to delete the member, or returns a promise rejectable with false
-  if not.
+  Define a function that handles the deletion of an offer and returns a promise
+  resolvable with the deleted offer’s ID if the requester is authorized to
+  delete the offer, or returns a promise rejectable with false if not.
 */
-const _delete = (requester, member, isOwn) => {
-  return modelQueries.deleteObject(requester, 'member', isOwn, member);
+const _delete = (requester, offer) => {
+  return modelQueries._delete(requester, 'offer', offer);
 };
 
 /*
-  Define a function that handles the update of a property of a member and
-  returns a promise resolvable with the updated member’s ID if the requester
-  is authorized to update that property of that member, or returns a promise
+  Define a function that handles the update of a property of an offer and
+  returns a promise resolvable with the updated offer’s ID if the requester
+  is authorized to update that property of that offer, or returns a promise
   rejectable with false if not.
 */
-const _update = (requester, member, property, value, isOwn) => {
-  return modelQueries.updateProperty(
-    requester, 'member', isOwn, member, property, value
-  );
+const _update = (requester, offer, property, value) => {
+  return modelQueries._update(requester, 'offer', offer, property, value);
 };
 
 module.exports = {_create, _delete, _update};

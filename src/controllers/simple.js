@@ -1,37 +1,32 @@
 const modelQueries = require('../model/queries');
 
 /*
-  Define a function that handles the creation of a member and returns
-  a promise resolvable with the new member’s ID if the requester is
-  authorized to create a member, or returns a promise rejectable with false
-  if not.
+  Define a function that handles the creation of a simple object and returns
+  a promise resolvable with the new object’s ID if the requester is authorized
+  to create such an object, or returns a promise rejectable with false if not.
 */
-const _create = (requester, fullname, handle, phase) => {
-  return modelQueries.createObject(
-    requester, 'member', false, {fullname, handle, phase}
-  );
+const _create = (requester, objectType, description) => {
+  return modelQueries._create(requester, objectType, {description});
 };
 
 /*
-  Define a function that handles the deletion of a member and returns
-  a promise resolvable with the deleted member’s ID if the requester is
-  authorized to delete the member, or returns a promise rejectable with false
+  Define a function that handles the deletion of a simple object and returns
+  a promise resolvable with the deleted object’s ID if the requester is
+  authorized to delete the object, or returns a promise rejectable with false
   if not.
 */
-const _delete = (requester, member, isOwn) => {
-  return modelQueries.deleteObject(requester, 'member', isOwn, member);
+const _delete = (requester, objectType, object) => {
+  return modelQueries._delete(requester, objectType, object);
 };
 
 /*
-  Define a function that handles the update of a property of a member and
-  returns a promise resolvable with the updated member’s ID if the requester
-  is authorized to update that property of that member, or returns a promise
-  rejectable with false if not.
+  Define a function that handles the update of a property of a simple object
+  and returns a promise resolvable with the updated object’s ID if the
+  requester is authorized to update that property of that object, or returns
+  a promise rejectable with false if not.
 */
-const _update = (requester, member, property, value, isOwn) => {
-  return modelQueries.updateProperty(
-    requester, 'member', isOwn, member, property, value
-  );
+const _update = (requester, objectType, object, property, value) => {
+  return modelQueries._update(requester, objectType, object, property, value);
 };
 
 module.exports = {_create, _delete, _update};
