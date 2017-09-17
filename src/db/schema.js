@@ -333,7 +333,7 @@ const schema = {
       },
       power: {
         object: 'table that is the permitted target of the action',
-        property: 'column to which the action is limited, or all if null'
+        property: 'column to which the action is limited, or all if null',
         role: 'empowered role, or members may act on their own records if null'
       }
     }

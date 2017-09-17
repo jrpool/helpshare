@@ -114,8 +114,8 @@ router.delete('/claim', (request, response) => {
     else if (typeof resultRow === 'object') {
       response.send(
         'Error (routes/skills/delete/claim):\n'
-        + `${resultRows.message}\n`
-        + `${resultRows.detail ? '\n' + resultRows.detail : ''}\n`
+        + `${resultRow.message}\n`
+        + `${resultRow.detail ? '\n' + resultRow.detail : ''}\n`
       );
     }
     else {
