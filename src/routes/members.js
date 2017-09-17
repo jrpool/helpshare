@@ -6,7 +6,7 @@ const memberController = require('../controllers/members');
 // Handle requests to create members.
 router.post('/', (request, response) => {
   const {requester, fullname, handle, phase} = request.body;
-  memberController.create(requester, fullname, handle, phase)
+  memberController._create(requester, fullname, handle, phase)
   .then(result => {
     if (typeof result === 'object') {
       response.send(

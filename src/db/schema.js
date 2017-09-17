@@ -27,7 +27,7 @@ const schema = {
         nn: true
       }
     },
-    location: {
+    area: {
       id: {
         type: 'SERIAL',
         pk: true
@@ -50,17 +50,6 @@ const schema = {
       }
     },
     rating: {
-      id: {
-        type: 'SERIAL',
-        pk: true
-      },
-      description: {
-        type: 'TEXT',
-        unique: true,
-        nn: true
-      }
-    },
-    genre: {
       id: {
         type: 'SERIAL',
         pk: true
@@ -101,7 +90,7 @@ const schema = {
         fk: 'phase(id)'
       }
     },
-    roleplay: {
+    badge: {
       id: {
         type: 'SERIAL',
         pk: true
@@ -117,7 +106,7 @@ const schema = {
         nn: true
       }
     },
-    relevance: {
+    about: {
       id: {
         type: 'SERIAL',
         pk: true
@@ -164,7 +153,7 @@ const schema = {
         fk: 'member(id)',
         nn: true
       },
-      location: {
+      area: {
         type: 'INTEGER',
         fk: 'location(id)',
         nn: true
@@ -203,7 +192,7 @@ const schema = {
         type: 'TIMESTAMPTZ'
       }
     },
-    assessment: {
+    report: {
       id: {
         type: 'SERIAL',
         pk: true
@@ -243,11 +232,6 @@ const schema = {
       member: {
         type: 'INTEGER',
         fk: 'member(id)',
-        nn: true
-      },
-      genre: {
-        type: 'INTEGER',
-        fk: 'genre(id)',
         nn: true
       },
       content: {
@@ -293,29 +277,28 @@ const schema = {
     }
   },
   uniques: {
-    relevance: ['skill', 'domain'],
+    about: ['skill', 'domain'],
     claim: ['member', 'skill'],
-    roleplay: ['member', 'role'],
+    badge: ['member', 'role'],
     power: ['action', 'object', 'property', 'role']
   },
   comments: {
     table: {
+      about: 'skills’ pertinence to domains',
       action: 'actions that powers permit',
-      assessment: 'reports on help offers',
+      area: 'physical parts of site where callers are working',
+      badge: 'members’ possessions of roles',
+      call: 'assertions by members of desire to receive help',
       domain: 'subject categories to which skills belong',
-      genre: 'types of log entries',
-      location: 'physical parts of site where callers are working',
       log: 'log of commands and other events',
       claim: 'members’ claims to have skills',
-      member: 'persons in a community served by HelpShare',
+      member: 'persons in a community served by this application',
       offer: 'assertions by members of intent to provide called-for help',
       phase: 'seniority categories to which members belong',
       power: 'powers to act on records and properties',
       rating: 'categories to which assessments assign help calls',
-      relevance: 'skills’ pertinence to domains',
-      call: 'assertions by members of desire to receive help',
+      report: 'assessments of help transactions',
       role: 'privilege categories to which members belong',
-      roleplay: 'members’ possessions of roles',
       skill: 'item of knowledge'
     },
     column: {
@@ -445,8 +428,7 @@ const getMiniseedQueries = () => {
   const specs = {
     member: [['fullname', 'handle'], ['Temporary Manager', 'tempmgr']],
     role: [['description'], ['manager']],
-    roleplay: [['member', 'role'], [1, 1]],
-    genre: [['description'], ['query']],
+    badge: [['member', 'role'], [1, 1]],
     action: [['description'], ['insert']],
     power: [['action', 'object', 'role'], [1, 'power', 1]]
   };
