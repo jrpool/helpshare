@@ -2,16 +2,17 @@ const dbQueries = require('../db/queries');
 const dbPowers = require('../db/powers');
 
 /*
-  Define a function that, if there is an authorizing add_row power, creates
-  a thing, logs it, and returns a promise resolvable with the ID of the
-  new thing, or, if not, with false.
+  Define a function that creates a record, logs the creation, and returns
+  a promise resolvable with the ID of the inserted record, if there is an
+  authorizing power, or returns a promise rejectable with false if there
+  is not.
 */
-const createOne = (requester, thing, own, args) => {
-  return dbPowers.hasRow(requester, 'add', thing, own)
+const createObject = (requester, object, isOwn, args) => {
+  return dbPowers.hasRow(requester, 'insert', object, isOwn)
   .then(resultRow => {
     if (resultRow.has_power) {
       return dbQueries.submit(
-        requester, dbQueries.getInsertQuery(thing, args)
+        requester, dbQueries.getInsertQuery(object, args)
       );
     }
     else {
@@ -24,15 +25,16 @@ const createOne = (requester, thing, own, args) => {
 };
 
 /*
-  Define a function that, if there is an authorizing kill_row power, deletes
-  a thing, logs the deletion, and returns a promise resolvable with the
-  result of the deletion, or, if not, with false.
+  Define a function that deletes a record, logs the deletion, and returns
+  a promise resolvable with the ID of the deleted record, if there is an
+  authorizing power, or returns a promise rejectable with false if there
+  is not.
 */
-const deleteOne = (requester, thing, own, id) => {
-  return dbPowers.hasRow(requester, 'kill', thing, own)
+const deleteObject = (requester, object, isOwn, id) => {
+  return dbPowers.hasRow(requester, 'delete', object, isOwn)
   .then(resultRow => {
     if (resultRow.has_power) {
-      return dbQueries.submit(requester, dbQueries.getDeleteQuery(thing, id));
+      return dbQueries.submit(requester, dbQueries.getDeleteQuery(object, id));
     }
     else {
       return false;
@@ -44,16 +46,17 @@ const deleteOne = (requester, thing, own, id) => {
 };
 
 /*
-  Define a function that, if there is an authorizing change_col power,
-  changes the value of a property of a thing, logs the change, and returns
-  a promise resolvable with the ID of the thing, or, if not, with false.
+  Define a function that updates a property in a record, logs the update,
+  and returns a promise resolvable with the ID of the updated record, if
+  there is an authorizing power, or returns a promise rejectable with
+  false if there is not.
 */
-const changeOne = (requester, thing, own, id, property, value) => {
-  return dbPowers.hasCol(requester, 'change', thing, property, own)
+const updateProperty = (requester, object, isOwn, id, property, value) => {
+  return dbPowers.hasCol(requester, 'update', object, property, isOwn)
   .then(resultRow => {
     if (resultRow.has_power) {
       return dbQueries.submit(
-        requester, dbQueries.getUpdateQuery(thing, id, property, value)
+        requester, dbQueries.getUpdateQuery(object, id, property, value)
       );
     }
     else {
@@ -65,4 +68,4 @@ const changeOne = (requester, thing, own, id, property, value) => {
   });
 };
 
-module.exports = {createOne, deleteOne, changeOne};
+module.exports = {createObject, deleteObject, updateProperty};

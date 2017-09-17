@@ -2,50 +2,46 @@ const db = require('./db').db;
 const PQ = require('pg-promise').ParameterizedQuery;
 
 /*
-  Define a function that returns whether a member has a column power (i.e.
-  (change_col or read_col) over a column of a table, given whether the row
-  is the member’s own.
+  Define a function that returns whether a member has a power over a column
+  of a table, given whether the row is the member’s own.
 */
-const hasCol = (requester, power, table, col, isOwn) => {
-  const powerTable = `${power}_col`;
+const hasCol = (requester, action, object, property, isOwn) => {
   const pq = new PQ(
     `
-      SELECT COUNT(${powerTable}.relation) > 0 AS has_power
-      FROM ${powerTable}, member, roleplay
-      WHERE ${powerTable}.relation = $1
-      AND ${powerTable}.col = $2
+      SELECT COUNT(power.${object}) > 0 AS has_power
+      FROM power, member, roleplay
+      WHERE power.object = $1
+      AND power.property = $2
       AND member.id = $3
       AND (
-        ($4 AND ${powerTable}.role IS NULL)
-        OR (roleplay.role = ${powerTable}.role AND member.id = roleplay.member)
+        ($4 AND power.role IS NULL)
+        OR (roleplay.role = power.role AND member.id = roleplay.member)
       )
     `,
-    [table, col, requester, isOwn]
+    [object, property, requester, isOwn]
   );
   return db.one(pq);
 };
 
 /*
-  Define a function that returns whether a member has a row power (i.e.
-  add_row or kill_row) over a table, given whether the row is the member’s
-  own.
+  Define a function that returns whether a member has a power over a row
+  of a table, given whether the row is the member’s own.
 */
-const hasRow = (requester, power, table, isOwn) => {
-  const powerTable = `${power}_row`;
+const hasRow = (requester, action, object, isOwn) => {
   const pq = new PQ(
     `
-      SELECT COUNT(${powerTable}.relation) > 0 AS has_power
-      FROM ${powerTable}, member, roleplay
-      WHERE ${powerTable}.relation = $1
+      SELECT COUNT(power.${object}) > 0 AS has_power
+      FROM power, member, roleplay
+      WHERE power.object = $1
       AND member.id = $2
       AND (
-        ($3 AND ${powerTable}.role IS NULL)
-        OR (roleplay.role = ${powerTable}.role AND member.id = roleplay.member)
+        ($3 AND power.role IS NULL)
+        OR (roleplay.role = power.role AND member.id = roleplay.member)
       )
     `,
-    [table, requester, isOwn]
+    [object, requester, isOwn]
   );
   return db.one(pq);
 };
 
-module.exports = {hasRow, hasCol};
+module.exports = {hasCol, hasRow};
