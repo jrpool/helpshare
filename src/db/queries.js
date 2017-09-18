@@ -3,9 +3,8 @@ const log = require('./log');
 const PQ = require('pg-promise').ParameterizedQuery;
 
 /*
-  Define a function that returns a ParameterizedQuery object that will insert
-  a row into a table and return an array of 1 row object containing the ID of
-  the new row.
+  Define a function that returns a ParameterizedQuery object that will insert a
+  row into a table and return an array of 1 row object containing the new row.
 */
 const getInsertQuery = (table, args) => {
   const cols = Object.keys(args);
@@ -13,18 +12,18 @@ const getInsertQuery = (table, args) => {
   const colList = cols.join(', ');
   const paramList = cols.map((v, index) => `$${index + 1}`).join(', ');
   return new PQ(
-    `INSERT INTO ${table} (${colList}) VALUES (${paramList}) RETURNING id`,
+    `INSERT INTO ${table} (${colList}) VALUES (${paramList}) RETURNING *`,
     vals
   );
 };
 
 /*
   Define a function that returns a ParameterizedQuery object that will delete
-  a row from a table and return an array of 1 row object containing the ID
-  of the deleted row.
+  a row from a table and return an array of 1 row object containing the
+  deleted row.
 */
 const getDeleteQuery = (table, id) => new PQ(
-  `DELETE FROM ${table} WHERE id = $1 RETURNING id`, [id]
+  `DELETE FROM ${table} WHERE id = $1 RETURNING *`, [id]
 );
 
 /*
@@ -34,22 +33,22 @@ const getDeleteQuery = (table, id) => new PQ(
 */
 const getUpdateQuery = (table, row, col, value) => {
   return new PQ(
-    `UPDATE ${table} SET ${col} = $1 WHERE id = $2 RETURNING id`,
+    `UPDATE ${table} SET ${col} = $1 WHERE id = $2 RETURNING *`,
     [value, row]
   );
 };
 
 /*
-  Define a function that submits a query, logs it, and returns a promise that is either resolvable with the ID of the affected row or rejectable with a
-  reason if the count of affected rows is not 1. The query may be a string or
-  a parameterizedQuery object.
+  Define a function that submits a query, logs it, and returns a promise that is either resolvable with the affected row or rejectable with a reason if
+  the count of affected rows is not 1. The query may be a string or a
+  parameterizedQuery object.
 */
 const submit = (requester, query) => {
   return db.task(context => {
     return context.one(query)
-    .then(idRow => {
+    .then(resultRow => {
       return context.none(log.getQuery(requester, query))
-      .then(() => idRow.id);
+      .then(() => resultRow);
     });
   })
   .catch(error => {

@@ -1,30 +1,44 @@
 // This module routes all about requests. Prefix: “/about”.
 
 const router = require('express').Router();
-const modelQueries = require('../model/queries');
+const queries = require('../controllers/about');
+const views = require('../views/api/about');
 
-// Handle requests to create relevances.
+// Handle requests to create abouts.
 router.post('/', (request, response) => {
   const {requester, skill, domain} = request.body;
-  modelQueries.createOne(requester, 'relevance', false, {skill, domain})
+  queries._create(requester, skill, domain)
   .then(result => {
-    if (typeof result === 'object') {
-      response.send(
-        'Error (routes/skills/post/re):\n'
-        + `${result.message}\n${result.detail}\n`
-      );
-    }
-    else {
-      response.send(
-        result
-          ? `Member ${requester} created relevance ${result}, `
-            + `assigning skill ${skill} to domain ${domain}.\n`
-          : `Member ${requester} may not create relevances.\n`
-      );
-    }
+    return response.send(views._create(requester, result));
   })
   .catch(error => {
-    response.send('Error (routes/skills/post/re):\n' + error + '\n');
+    response.send('Error (routes/about/post):\n' + error + '\n');
+  });
+});
+
+// Handle requests to delete abouts.
+router.delete('/', (request, response) => {
+  const {requester, about} = request.body;
+  queries._delete(requester, about)
+  .then(result => {
+    return response.send(views._delete(requester, result));
+  })
+  .catch(error => {
+    response.send('Error (routes/about/delete):\n' + error + '\n');
+  });
+});
+
+// Handle requests to update abouts.
+router.put('/', (request, response) => {
+  const {requester, about, property, value} = request.body;
+  queries._update(requester, about, property, value)
+  .then(result => {
+    return response.send(
+      views._update(requester, property, result)
+    );
+  })
+  .catch(error => {
+    response.send('Error (routes/about/put):\n' + error + '\n');
   });
 });
 

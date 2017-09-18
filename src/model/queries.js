@@ -3,9 +3,8 @@ const dbPowers = require('../db/powers');
 
 /*
   Define a function that creates a record, logs the creation, and returns
-  a promise resolvable with the ID of the inserted record, if there is an
-  authorizing power, or returns a promise rejectable with false if there
-  is not.
+  a promise resolvable with the inserted record, if there is an authorizing
+  power, or returns a promise rejectable with false if there is not.
 */
 const _create = (requester, object, args) => {
   return dbPowers._insert(requester, object, args)
@@ -26,9 +25,8 @@ const _create = (requester, object, args) => {
 
 /*
   Define a function that deletes a record, logs the deletion, and returns
-  a promise resolvable with the ID of the deleted record, if there is an
-  authorizing power, or returns a promise rejectable with false if there
-  is not.
+  a promise resolvable with the deleted record, if there is an authorizing
+  power, or returns a promise rejectable with false if there is not.
 */
 const _delete = (requester, object, id) => {
   return dbPowers._delete(requester, object, id)
@@ -46,10 +44,9 @@ const _delete = (requester, object, id) => {
 };
 
 /*
-  Define a function that updates a property in a record, logs the update,
-  and returns a promise resolvable with the ID of the updated record, if
-  there is an authorizing power, or returns a promise rejectable with
-  false if there is not.
+  Define a function that updates a property in a record, logs the update, and
+  returns a promise resolvable with the updated record, if there is an
+  authorizing power, or returns a promise rejectable with false if there is not.
 */
 const _update = (requester, object, id, property, value) => {
   return dbPowers._update(requester, object, property, id)
