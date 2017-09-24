@@ -341,7 +341,7 @@ const batchSubmit = (requester, queries, areLogged) => {
   const finalQueries = queries.slice();
   if (areLogged) {
     const logQueries = queries.map(query => {
-      return log.getQueryQuery(requester, query);
+      return log.getQuery(requester, query);
     });
     finalQueries.push(...logQueries);
   }
