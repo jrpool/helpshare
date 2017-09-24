@@ -155,7 +155,7 @@ const schema = {
       },
       area: {
         type: 'INTEGER',
-        fk: 'location(id)',
+        fk: 'area(id)',
         nn: true
       },
       comment: {
