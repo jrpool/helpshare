@@ -14,3 +14,5 @@ const create = (id, requester, object, properties, response) => {
 const error = (error, requester, object, properties, response) => {
   renderError(error, response)
 };
+
+module.exports = {create, error};
