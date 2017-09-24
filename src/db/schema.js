@@ -430,23 +430,23 @@ const installSchema = () => {
 
 // Define a function that returns the queries to minimally seed the database.
 const getMiniseedQueries = () => {
-  const specs = {
-    member: [['fullname', 'handle'], ['Temporary Manager', 'tempmgr']],
-    role: [['description'], ['manager']],
-    badge: [['member', 'role'], [1, 1]],
-    action: [['description'], ['insert']],
-    action: [['description'], ['delete']],
-    action: [['description'], ['update']],
-    action: [['description'], ['select']],
-    power: [['action', 'object', 'role'], [1, 'power', 1]]
-  };
-  return Object.keys(specs).map(table => {
-    const colList = specs[table][0].join(', ');
+  const specs = [
+    ['member', ['fullname', 'handle'], ['Temporary Manager', 'tempmgr']],
+    ['role', ['description'], ['manager']],
+    ['badge', ['member', 'role'], [1, 1]],
+    ['action', ['description'], ['insert']],
+    ['action', ['description'], ['delete']],
+    ['action', ['description'], ['update']],
+    ['action', ['description'], ['select']],
+    ['power', ['action', 'object', 'role'], [1, 'power', 1]]
+  ];
+  return specs.map(spec => {
+    const colList = spec[1].join(', ');
     const valParamList
-      = specs[table][1].map((v, index) => '$' + (index + 1)).join(', ');
+      = spec[2].map((v, index) => '$' + (index + 1)).join(', ');
     return new PQ(
-      `INSERT INTO ${table} (${colList}) VALUES (${valParamList})`,
-      specs[table][1]
+      `INSERT INTO ${spec[0]} (${colList}) VALUES (${valParamList})`,
+      spec[2]
     );
   });
 };

@@ -1,23 +1,23 @@
 const app = require('express')();
+const bp = require('body-parser').json({type: '*/*'});
 
-// Execute body-parser on every valid request with a body.
-
-const bpMiddleware = [
-  '/:requester([1-9]\\d{0,})/*',
-  require('body-parser').json({type: '*/*'}),
-  (request, response, next) => {
-    request.body.requester = request.params.requester;
-    next();
+/*
+  Syntactically validate the requester ID in the request path. Make it,
+  or null if invalid, the value of a property of the request.
+*/
+app.use((request, response, next) => {
+  const requesterData = /^[1-9][0-9]*(?=\/)/.exec(request.path);
+  if (requesterData) {
+    request.requester = requesterData[0];
+    if (['post', 'put'].includes(request.method)) {
+      bp(request, response, next);
+    }
   }
-];
-
-
-app.post(...bpMiddleware);
-app.delete(...bpMiddleware);
-app.put(...bpMiddleware);
-
-// Load ./src/routes.index.js on every valid query.
-app.use('/:requester([1-9]\\d{0,})', require('./src/routes'));
+  else {
+    request.requester = null;
+  }
+  require('./src/routes');
+});
 
 // Listen for requests on port 3000 of localhost.
 app.listen(3000, function() {

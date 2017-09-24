@@ -1,10 +1,16 @@
-const router = require('express').Router();
+const renderError = ((error, response) => {
+  response.send(error.message + '\n' + error.stack);
+});
 
-// Delegate routing to specialized modules.
-router.use('/members', require('./members'));
-router.use('/skills', require('./skills'));
-router.use('/acts', require('./acts'));
-router.use('/roles', require('./roles'));
-router.use('/powers', require('./powers'));
+const create = (id, requester, object, properties, response) => {
+  if (result) {
+    response.send(`Member ${requester} created ${object} ${id}.`);
+  }
+  else {
+    response.send(`Member ${requester} has no permission to create a(n) ${object}.`);
+  }
+};
 
-module.exports = router;
+const error = (error, requester, object, properties, response) => {
+  renderError(error, response)
+};

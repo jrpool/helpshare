@@ -6,12 +6,12 @@ const dbPowers = require('../db/powers');
   a promise resolvable with the inserted record, if there is an authorizing
   power, or returns a promise rejectable with false if there is not.
 */
-const _create = (requester, object, args) => {
-  return dbPowers._insert(requester, object, args)
+const create = (requester, object, properties) => {
+  return dbPowers._insert(requester, object, properties)
   .then(resultRow => {
     if (resultRow.has_power) {
       return dbQueries.submit(
-        requester, dbQueries.getInsertQuery(object, args)
+        requester, dbQueries.getInsertQuery(object, properties)
       );
     }
     else {
@@ -65,4 +65,4 @@ const _update = (requester, object, id, property, value) => {
   });
 };
 
-module.exports = {_create, _delete, _update};
+module.exports = {create, _delete, _update};

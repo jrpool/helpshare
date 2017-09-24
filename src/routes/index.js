@@ -1,10 +1,14 @@
 const router = require('express').Router();
+const commands = require('../controllers');
 
-// Delegate routing to specialized modules.
-router.use('/members', require('./members'));
-router.use('/skills', require('./skills'));
-router.use('/acts', require('./acts'));
-router.use('/roles', require('./roles'));
-router.use('/powers', require('./powers'));
+router.post('/:requester/create/:object([a-z]+)', (request, response) => {
+  commands.create(
+    request.requester, request.params.object, request.body, response
+  );
+});
 
-module.exports = router;
+// More routes to be added here.
+
+router.use((request, response) => {
+  commands.error(request, response);
+});
