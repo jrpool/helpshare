@@ -1,6 +1,6 @@
 const app = require('express')();
 
-// Execute body-parser on every valid POST, DELETE, or PUT request.
+// Execute body-parser on every valid request with a body.
 
 const bpMiddleware = [
   '/:requester([1-9]\\d{0,})/*',
