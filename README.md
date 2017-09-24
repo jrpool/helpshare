@@ -47,11 +47,21 @@ Future versions may be required to include the following additional features:
 
 ## Implementation
 
+### Schema
+
 The above requirements are modeled in a database whose schema is summarized and diagrammed below.
 
-<p align='center'><img src='summary.png' alt='members need skills, make help requests, and answer help requests'></p>
+<p align='center'><img src='public/summary.png' alt='members need skills, make help requests, and answer help requests'></p>
 
 <p align='center'><img src='public/helpshare.png' alt='entity-relationship diagram for database'></p>
+
+### Interaction Architecture
+
+The application models the interaction between clients and data as follows:
+
+<p align='center'><img src='public/architecture.png' alt='MVC plus routes and database'></p>
+
+In this architecture, a client interacts with the API only via views. A view transmits a client’s request without evaluation to a main router, which chooses the appropriate specialized router. That router evaluates the request enough to assign it to the appropriate controller. That controller validates the request. If invalid, the controller chooses a view and instructs it to notify the client. If valid, the controller tells the model what operation to perform. The model performs that operation, using the database as needed, and returns a result to the controller, which chooses a view and instructs it to send the appropriate content to the client. In executing the controller’s instructions, a view can make required transformations of content and format, such as providing natural-language messages in various languages or choosing between JSON and HTML output as required by the client.
 
 ## Project Origin
 

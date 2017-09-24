@@ -1,53 +1,44 @@
-// This module routes all role requests. Prefix: “/roles”.
+// This module routes all badge requests. Prefix: “/badges”.
 
 const router = require('express').Router();
-const modelQueries = require('../model/queries');
+const queries = require('../controllers/badges');
+const views = require('../views/api/badges');
 
-// Handle requests to create roles.
+// Handle requests to create badges.
 router.post('/', (request, response) => {
-  const {requester, description} = request.body;
-  modelQueries.createOne(requester, 'role', false, {description})
+  const {requester, member, role} = request.body;
+  queries._create(requester, member, role)
   .then(result => {
-    if (typeof result === 'object') {
-      response.send(
-        'Error (routes/roles/post):\n'
-        + `${result.message}\n${result.detail}\n`
-      );
-    }
-    else {
-      response.send(
-        result
-          ? `Member ${requester} created role ${result} (${description}).\n`
-          : `Member ${requester} may not create roles.\n`
-      );
-    }
+    return response.send(views._create(requester, result));
   })
   .catch(error => {
-    response.send('Error (routes/roles/post):\n' + error + '\n');
+    response.send('Error (routes/badge/post):\n' + error + '\n');
   });
 });
 
-// Handle requests to create roleplays.
-router.post('/grant', (request, response) => {
-  const {requester, member, role} = request.body;
-  modelQueries.createOne(requester, 'roleplay', false, {member, role})
+// Handle requests to delete badges.
+router.delete('/', (request, response) => {
+  const {requester, badge} = request.body;
+  queries._delete(requester, badge)
   .then(result => {
-    if (typeof result === 'object') {
-      response.send(
-        'Error (routes/roles/post/grant):\n'
-        + `${result.message}\n${result.detail}\n`
-      );
-    }
-    else {
-      response.send(
-        result
-          ? `Member ${requester} granted member ${member} role ${role}.\n`
-          : `Member ${requester} may not grant roles.\n`
-      );
-    }
+    return response.send(views._delete(requester, result));
   })
   .catch(error => {
-    response.send('Error (routes/roles/post):\n' + error + '\n');
+    response.send('Error (routes/badge/delete):\n' + error + '\n');
+  });
+});
+
+// Handle requests to update badges.
+router.put('/', (request, response) => {
+  const {requester, badge, property, value} = request.body;
+  queries._update(requester, badge, property, value)
+  .then(result => {
+    return response.send(
+      views._update(requester, property, result)
+    );
+  })
+  .catch(error => {
+    response.send('Error (routes/badge/put):\n' + error + '\n');
   });
 });
 
