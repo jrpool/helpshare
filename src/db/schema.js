@@ -300,14 +300,14 @@ const schema = {
       offer: 'assertions by members of intent to provide called-for help',
       phase: 'seniority categories to which members belong',
       power: 'powers to act on records and properties',
-      rating: 'categories to which assessments assign help calls',
+      rating: 'categories to which reports assign help calls',
       report: 'assessments of help transactions',
       role: 'privilege categories to which members belong',
       skill: 'item of knowledge'
     },
     column: {
-      assessment: {
-        member: 'member making the assessment'
+      report: {
+        member: 'member making the report'
       },
       log: {
         member: 'member issuing the command or taking the action',
