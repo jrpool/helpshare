@@ -37,7 +37,7 @@ router.get(
 router.post(
   '/:requester([1-9][0-9]{0,})/:object([a-z]+)',
   (request, response) => {
-    controllers.create(
+    controllers.create1Record(
       request.params.requester, request.params.object, request.body, response
     );
   }
