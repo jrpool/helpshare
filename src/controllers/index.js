@@ -76,7 +76,7 @@ const update1Value = (requester, object, id, property, value, response) => {
 
 // Define a function that acts on an error.
 const error = (error, response) => {
-  views.error(response);
+  views.error(error, response);
 };
 
 module.exports = {

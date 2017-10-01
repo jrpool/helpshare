@@ -70,7 +70,7 @@ router.delete(
 );
 
 router.use((request, response) => {
-  controllers.error(response);
+  controllers.error('Invalid request', response);
 });
 
 module.exports = router;
