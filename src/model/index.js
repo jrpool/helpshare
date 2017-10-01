@@ -109,5 +109,5 @@ const update1Value = (requester, object, id, property, value) => {
 
 module.exports = {
   readAll, read1Record, read1Property,
-  create1Record, delete1Record, update1Record
+  create1Record, delete1Record, update1Value
 };

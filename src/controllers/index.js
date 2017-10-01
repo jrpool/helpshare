@@ -80,6 +80,6 @@ const error = (error, response) => {
 };
 
 module.exports = {
-  readAll, read1Record, read1Property, create,
-  update1Record, delete1Record, update1Value, error
+  readAll, read1Record, read1Property, create1Record,
+  delete1Record, update1Value, error
 };

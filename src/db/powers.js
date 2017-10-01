@@ -61,7 +61,7 @@ const select1Row = (requester, table, id) => {
           AND power.object = $2
           AND power.property IS NULL
           AND badge.role = power.role
-          AND badge.member = $3
+          AND badge.member = $4
         THEN
           true
         ELSE
@@ -71,11 +71,12 @@ const select1Row = (requester, table, id) => {
           AND power.object = $2
           AND power.property IS NULL
           AND power.role IS NULL
-          AND ${table + '.' + memberCol(table)} = $3
+          AND ${table}.id = $3
+          AND ${table + '.' + memberCol(table)} = $4
         END
       AS has_power
     `,
-    [actionID('select'), table, requester]
+    [actionID('select'), table, id, requester]
   );
   return db.one(pq);
 };
@@ -170,7 +171,7 @@ const delete1Row = (requester, table, id) => {
           SELECT COUNT(id) > 0
           FROM ${table}
           WHERE id = $4
-          AND ${values[memberCol(table)]} = $3
+          AND ${table}.${memberCol(table)} = $3
         )
       END
     `,
@@ -215,7 +216,7 @@ const update1Value = (requester, table, id, col, value) => {
           SELECT COUNT(id) > 0
           FROM ${table}
           WHERE id = $3
-          AND ${values[memberCol(table)]} = $6
+          AND ${table}.${memberCol(table)} = $6
         )
       END
     `,
@@ -224,4 +225,6 @@ const update1Value = (requester, table, id, col, value) => {
   return db.one(pq);
 };
 
-module.exports = {select1Row, select1Col, insertRows, delete1Row, update1Value};
+module.exports = {
+  selectAll, select1Row, select1Col, insertRows, delete1Row, update1Value
+};

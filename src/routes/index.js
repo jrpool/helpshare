@@ -44,7 +44,7 @@ router.post(
 );
 
 router.put(
-  '/:requester([1-9][0-9]{0,})/:object([a-z]+)/:id([1-9][0-9]{0,}/:property([a-z]+)',
+  '/:requester([1-9][0-9]{0,})/:object([a-z]+)/:id([1-9][0-9]{0,})/:property([a-z]+)',
   (request, response) => {
     controllers.update1Value(
       request.params.requester,
@@ -58,7 +58,7 @@ router.put(
 );
 
 router.delete(
-  '/:requester([1-9][0-9]{0,})/:object([a-z]+)/:id([1-9][0-9]{0,}',
+  '/:requester([1-9][0-9]{0,})/:object([a-z]+)/:id([1-9][0-9]{0,})',
   (request, response) => {
     controllers.delete1Record(
       request.params.requester,
