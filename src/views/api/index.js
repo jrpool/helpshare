@@ -5,7 +5,7 @@ const reportAll = (resultRows, requester, object, response) => {
   else {
     response.json(
       {requester, action: 'read', object, error: 'no permission'}
-    );
+    ).send('\n');
   }
 };
 
@@ -16,7 +16,7 @@ const report1Record = (resultRow, requester, object, id, response) => {
   else {
     response.json(
       {requester, action: 'read', object, error: 'no permission'}
-    );
+    ).send('\n');
   }
 };
 
@@ -29,13 +29,14 @@ const report1Property = (
   else {
     response.json(
       {requester, action: 'read', object, property, error: 'no permission'}
-    );
+    ).send('\n');
   }
 };
 
 const created1Record = (resultRow, requester, object, specs, response) => {
   if (resultRow) {
-    response.json({requester, action: 'create', object, specs, resultRow});
+    response.json({requester, action: 'create', object, specs, resultRow})
+    .send('\n');
   }
   else {
     response.json(
@@ -46,7 +47,8 @@ const created1Record = (resultRow, requester, object, specs, response) => {
 
 const deleted1Record = (resultRow, requester, object, id, response) => {
   if (resultRow) {
-    response.json({requester, action: 'delete', object, id, resultRow});
+    response.json({requester, action: 'delete', object, id, resultRow})
+    .send('\n');
   }
   else {
     response.json(
@@ -61,7 +63,7 @@ const updated1Value = (
   if (resultRow) {
     response.json(
       {requester, action: 'update', object, id, property, value, resultRow}
-    );
+    ).send('\n');
   }
   else {
     response.json({
@@ -72,7 +74,7 @@ const updated1Value = (
 };
 
 const error = (error, response) => {
-  renderError(error, response)
+  response.json(error).send('\n');
 };
 
 module.exports = {
