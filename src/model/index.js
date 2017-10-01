@@ -57,6 +57,7 @@ const read1Property = (requester, object, property) => {
 const create1Record = (requester, object, specs) => {
   return dbPowers.insertRows(requester, object, specs)
   .then(resultRow => {
+    console.log('Insert power result is ' + JSON.stringify(resultRow));
     if (resultRow.has_power) {
       return dbQueries.submit1(
         requester, dbQueries.getInsert1RowQuery(object, specs)
@@ -97,8 +98,6 @@ const update1Value = (requester, object, id, property, value) => {
       return dbQueries.submit1(
         requester, dbQueries.getUpdate1ValueQuery(object, id, property, value)
       );
-      // .then(resultRow => resultRow)
-      // .catch(error => error);
     }
     else {
       return false;

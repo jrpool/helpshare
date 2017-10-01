@@ -51,6 +51,17 @@ const selectAll = (requester, table) => {
   power to select 1 row of a table, as a promise’s resolution value.
 */
 const select1Row = (requester, table, id) => {
+  const memberColName = memberCol(table);
+  const elseClause = memberColName ? `(
+    SELECT COUNT(power.id) > 0
+    FROM power, badge, ${table}
+    WHERE power.action = $1
+    AND power.object = $2
+    AND power.property IS NULL
+    AND power.role IS NULL
+    AND ${table}.id = $3
+    AND ${table}.${memberColName} = $4
+  )` : 'false';
   const pq = new PQ(
     `
       SELECT
@@ -65,14 +76,7 @@ const select1Row = (requester, table, id) => {
         THEN
           true
         ELSE
-          SELECT COUNT(power.id) > 0
-          FROM power, badge, ${table}
-          WHERE power.action = $1
-          AND power.object = $2
-          AND power.property IS NULL
-          AND power.role IS NULL
-          AND ${table}.id = $3
-          AND ${table + '.' + memberCol(table)} = $4
+          ${elseClause}
         END
       AS has_power
     `,
@@ -109,11 +113,21 @@ const select1Col = (requester, table, col) => {
   Define a function that returns whether a member has the column-agnostic
   power to insert rows into a table, as a promise’s resolution value.
 */
-const insertRows = (requester, table, values) => {
+const insertRows = (requester, table, specs) => {
+  const memberSpec = specs[memberCol(table)];
+  const elseClause = memberSpec ? `(
+    SELECT COUNT(power.id) > 0
+    FROM power, badge
+    WHERE power.action = $1
+    AND power.object = $2
+    AND power.property IS NULL
+    AND power.role IS NULL
+    AND ${memberSpec} = $3
+  )` : 'false';
   const pq = new PQ(
     `
     SELECT
-      CASE WHEN
+      CASE WHEN (
         SELECT COUNT(power.id) > 0
         FROM power, badge
         WHERE power.action = $1
@@ -121,24 +135,16 @@ const insertRows = (requester, table, values) => {
         AND power.property IS NULL
         AND badge.role = power.role
         AND badge.member = $3
-      THEN
+      ) THEN
         true
-      ELSE WHEN
-        ${values[memberCol(table)] !== undefined}
-      THEN
-        SELECT COUNT(power.id) > 0
-        FROM power, badge
-        WHERE power.action = $1
-        AND power.object = $2
-        AND power.property IS NULL
-        AND power.role IS NULL
-        AND ${values[memberCol(table)]} = $3
       ELSE
-        false
+        ${elseClause}
       END
+    AS has_power
     `,
     [actionID('insert'), table, requester]
   );
+  console.log('The insert-power PQ is:\n' + pq);
   return db.one(pq);
 };
 
@@ -147,8 +153,22 @@ const insertRows = (requester, table, values) => {
   a row from a table, as a promise’s resolution value.
 */
 const delete1Row = (requester, table, id) => {
-  const pq = new PQ(
-    `
+  const memberColName = memberCol(table);
+  const elseClause = memberColName ? `
+    SELECT COUNT(power.id) > 0
+    FROM power, badge
+    WHERE power.action = $1
+    AND power.object = $2
+    AND power.property IS NULL
+    AND power.role IS NULL
+    AND (
+      SELECT COUNT(id) > 0
+      FROM ${table}
+      WHERE id = $4
+      AND ${table}.${memberColName} = $3
+    )
+  ` : 'false';
+  const pq = new PQ(`
     SELECT
       CASE WHEN
         SELECT COUNT(power.id) > 0
@@ -161,22 +181,10 @@ const delete1Row = (requester, table, id) => {
       THEN
         true
       ELSE
-        SELECT COUNT(power.id) > 0
-        FROM power, badge
-        WHERE power.action = $1
-        AND power.object = $2
-        AND power.property IS NULL
-        AND power.role IS NULL
-        AND (
-          SELECT COUNT(id) > 0
-          FROM ${table}
-          WHERE id = $4
-          AND ${table}.${memberCol(table)} = $3
-        )
+        ${elseClause}
       END
-    `,
-    [actionID('delete'), table, requester, id]
-  );
+    AS has_power
+  `, [actionID('delete'), table, requester, id]);
   return db.one(pq);
 };
 
@@ -186,8 +194,25 @@ const delete1Row = (requester, table, id) => {
   promise’s resolution value.
 */
 const update1Value = (requester, table, id, col, value) => {
-  const pq = new PQ(
-    `
+  const memberColName = memberCol(table);
+  const elseClause = memberColName ? `
+    SELECT COUNT(power.id) > 0
+    FROM power, badge
+    WHERE power.action = $1
+    AND power.object = $2
+    AND (
+      power.property = $4
+      OR power.property IS NULL
+    )
+    AND power.role IS NULL
+    AND (
+      SELECT COUNT(id) > 0
+      FROM ${table}
+      WHERE id = $3
+      AND ${table}.${memberColName} = $6
+    )
+  ` : 'false';
+  const pq = new PQ(`
     SELECT
       CASE WHEN
         SELECT COUNT(power.id) > 0
@@ -203,25 +228,10 @@ const update1Value = (requester, table, id, col, value) => {
       THEN
         true
       ELSE
-        SELECT COUNT(power.id) > 0
-        FROM power, badge
-        WHERE power.action = $1
-        AND power.object = $2
-        AND (
-          power.property = $4
-          OR power.property IS NULL
-        )
-        AND power.role IS NULL
-        AND (
-          SELECT COUNT(id) > 0
-          FROM ${table}
-          WHERE id = $3
-          AND ${table}.${memberCol(table)} = $6
-        )
+        ${elseClause}
       END
-    `,
-    [actionID('update'), table, id, col, value, requester]
-  );
+    AS has_power
+  `, [actionID('update'), table, id, col, value, requester]);
   return db.one(pq);
 };
 
