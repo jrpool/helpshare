@@ -1,60 +1,13 @@
 const db = require('./db').db;
 const PQ = require('pg-promise').ParameterizedQuery;
 
-// /*
-//   Define a function that returns whether a requester has a power over a column
-//   of a table, given whether the target is 1 row that has a member column with
-//   the requester as its value.
-// */
-// const hasCol = (requester, action, table, col, isOwn) => {
-//   const pq = new PQ(
-//     `
-//       SELECT COUNT(power.id) > 0 AS has_power
-//       FROM power, member, badge
-//       WHERE power.action = $1
-//       AND power.object = $2
-//       AND power.property = $3
-//       AND member.id = $4
-//       AND (
-//         ($5 AND power.role IS NULL)
-//         OR (badge.role = power.role AND member.id = badge.member)
-//       )
-//     `,
-//     [action, table, col, requester, isOwn]
-//   );
-//   return db.one(pq);
-// };
-//
-// /*
-//   Define a function that returns whether a member has a power over a row
-//   of a table, given whether the row is the member’s own.
-// */
-// const hasRow = (requester, action, table, isOwn) => {
-//   const pq = new PQ(
-//     `
-//       SELECT COUNT(power.id) > 0 AS has_power
-//       FROM action, power, member, badge
-//       WHERE power.action = $1
-//       AND power.object = $2
-//       AND member.id = $3
-//       AND (
-//         ($4 AND power.role IS NULL)
-//         OR (badge.role = power.role AND member.id = badge.member)
-//       )
-//     `,
-//     [action, table, requester, isOwn]
-//   );
-//   return db.one(pq);
-// };
-//
-
 // Define a function that returns the ID of an action.
 const actionID = actionName => {
   const actionIDs = {
-    _create: 1,
-    _delete: 2,
-    _update: 3,
-    _read: 4
+    insert: 1,
+    delete: 2,
+    update: 3,
+    read: 4
   };
   return actionIDs[actionName];
 };
@@ -67,82 +20,208 @@ const memberCol = table => {
     claim: 'member',
     call: 'member',
     offer: 'member',
-    report: 'member'
+    report: 'member',
+    log: 'member'
   };
   return memberCols[table];
 };
 
 /*
-  Define a function that returns whether a member has the power to insert
-  a row into a table. The power may arise from a role of the member or from
-  the member’s ID being the value of the member column of the row to be
-  inserted.
+  Define a function that returns whether a member has the column-agnostic
+  power to select all rows of a table, as a promise’s resolution value.
 */
-const _insert = (requester, table, args) => {
+const selectAll = (requester, table) => {
   const pq = new PQ(
     `
       SELECT COUNT(power.id) > 0 AS has_power
-      FROM power, member, badge
+      FROM power, badge
       WHERE power.action = $1
       AND power.object = $2
-      AND member.id = $3
-      AND (
-        (power.role IS NULL AND $4)
-        OR (badge.role = power.role AND badge.member = $3)
-      )
+      AND power.property IS NULL
+      AND badge.role = power.role
+      AND badge.member = $3
     `,
-    [actionID(_insert), table, requester, args[memberCol(table)] === requester]
+    [actionID('select'), table, requester]
+  );
+  return db.one(pq);
+};
+
+/*
+  Define a function that returns whether a member has the column-agnostic
+  power to select 1 row of a table, as a promise’s resolution value.
+*/
+const select1Row = (requester, table, id) => {
+  const pq = new PQ(
+    `
+      SELECT
+        CASE WHEN
+          SELECT COUNT(power.id) > 0
+          FROM power, badge
+          WHERE power.action = $1
+          AND power.object = $2
+          AND power.property IS NULL
+          AND badge.role = power.role
+          AND badge.member = $3
+        THEN
+          true
+        ELSE
+          SELECT COUNT(power.id) > 0
+          FROM power, badge, ${table}
+          WHERE power.action = $1
+          AND power.object = $2
+          AND power.property IS NULL
+          AND power.role IS NULL
+          AND ${table + '.' + memberCol(table)} = $3
+        END
+      AS has_power
+    `,
+    [actionID('select'), table, requester]
+  );
+  return db.one(pq);
+};
+
+/*
+  Define a function that returns whether a member has the column-agnostic
+  or column-specific power to select 1 column of all rows of a table, as
+  a promise’s resolution value.
+*/
+const select1Col = (requester, table, col) => {
+  const pq = new PQ(
+    `
+      SELECT COUNT(power.id) > 0 AS has_power
+      FROM power, badge
+      WHERE power.action = $1
+      AND power.object = $2
+      AND (
+        power.property = $3
+        OR power.property IS NULL
+      )
+      AND badge.role = power.role
+      AND badge.member = $4
+    `,
+    [actionID('select'), table, col, requester]
+  );
+  return db.one(pq);
+};
+
+/*
+  Define a function that returns whether a member has the column-agnostic
+  power to insert rows into a table, as a promise’s resolution value.
+*/
+const insertRows = (requester, table, values) => {
+  const pq = new PQ(
+    `
+    SELECT
+      CASE WHEN
+        SELECT COUNT(power.id) > 0
+        FROM power, badge
+        WHERE power.action = $1
+        AND power.object = $2
+        AND power.property IS NULL
+        AND badge.role = power.role
+        AND badge.member = $3
+      THEN
+        true
+      ELSE WHEN
+        ${values[memberCol(table)] !== undefined}
+      THEN
+        SELECT COUNT(power.id) > 0
+        FROM power, badge
+        WHERE power.action = $1
+        AND power.object = $2
+        AND power.property IS NULL
+        AND power.role IS NULL
+        AND ${values[memberCol(table)]} = $3
+      ELSE
+        false
+      END
+    `,
+    [actionID('insert'), table, requester]
   );
   return db.one(pq);
 };
 
 /*
   Define a function that returns whether a member has the power to delete
-  a row from a table. The power may arise from a role of the member or from
-  the member’s ID being the value of the member column of the row to be
-  deleted.
+  a row from a table, as a promise’s resolution value.
 */
-const _delete = (requester, table, id) => {
+const delete1Row = (requester, table, id) => {
   const pq = new PQ(
     `
-      SELECT COUNT(power.id) > 0 AS has_power
-      FROM power, member, badge, ${table}
-      WHERE power.action = $1
-      AND power.object = $2
-      AND member.id = $3
-      AND (
-        (power.role IS NULL AND ${table}.id = $4 AND ${table}.$5 = $3)
-        OR (badge.role = power.role AND badge.member = $3)
-      )
+    SELECT
+      CASE WHEN
+        SELECT COUNT(power.id) > 0
+        FROM power, badge
+        WHERE power.action = $1
+        AND power.object = $2
+        AND power.property IS NULL
+        AND badge.role = power.role
+        AND badge.member = $3
+      THEN
+        true
+      ELSE
+        SELECT COUNT(power.id) > 0
+        FROM power, badge
+        WHERE power.action = $1
+        AND power.object = $2
+        AND power.property IS NULL
+        AND power.role IS NULL
+        AND (
+          SELECT COUNT(id) > 0
+          FROM ${table}
+          WHERE id = $4
+          AND ${values[memberCol(table)]} = $3
+        )
+      END
     `,
-    [actionID(_delete), table, requester, id, memberCol(table)]
+    [actionID('delete'), table, requester, id]
   );
   return db.one(pq);
 };
 
 /*
-  Define a function that returns whether a requester has the power to update
-  a column of a row of a table. The power may arise from a role of the member
-  or from the member’s ID being the value of the member column of the row to
-  be updated.
+  Define a function that returns whether a requester has the column-agnostic
+  or column-specific power to update a column of a row of a table, as a
+  promise’s resolution value.
 */
-const _update = (requester, table, col, id) => {
+const update1Value = (requester, table, id, col, value) => {
   const pq = new PQ(
     `
-      SELECT COUNT(power.id) > 0 AS has_power
-      FROM power, member, badge, ${table}
-      WHERE power.action = $1
-      AND power.object = $2
-      AND power.property = $3
-      AND member.id = $4
-      AND (
-        (power.role IS NULL AND ${table}.id = $5 AND ${table}.$6 = $4)
-        OR (badge.role = power.role AND badge.member = $4)
-      )
+    SELECT
+      CASE WHEN
+        SELECT COUNT(power.id) > 0
+        FROM power, badge
+        WHERE power.action = $1
+        AND power.object = $2
+        AND (
+          power.property = $4
+          OR power.property IS NULL
+        )
+        AND badge.role = power.role
+        AND badge.member = $3
+      THEN
+        true
+      ELSE
+        SELECT COUNT(power.id) > 0
+        FROM power, badge
+        WHERE power.action = $1
+        AND power.object = $2
+        AND (
+          power.property = $4
+          OR power.property IS NULL
+        )
+        AND power.role IS NULL
+        AND (
+          SELECT COUNT(id) > 0
+          FROM ${table}
+          WHERE id = $3
+          AND ${values[memberCol(table)]} = $6
+        )
+      END
     `,
-    [actionID(_update), table, col, requester, id, memberCol(table)]
+    [actionID('update'), table, id, col, value, requester]
   );
   return db.one(pq);
 };
 
-module.exports = {actionID, _delete, _insert, _update};
+module.exports = {select1Row, select1Col, insertRows, delete1Row, update1Value};
