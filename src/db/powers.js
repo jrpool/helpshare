@@ -52,16 +52,22 @@ const selectAll = (requester, table) => {
 */
 const select1Row = (requester, table, id) => {
   const memberColName = memberCol(table);
-  const elseClause = memberColName ? `(
-    SELECT COUNT(power.id) > 0
-    FROM power, badge, ${table}
-    WHERE power.action = $1
-    AND power.object = $2
-    AND power.property IS NULL
-    AND power.role IS NULL
-    AND ${table}.id = $3
-    AND ${table}.${memberColName} = $4
-  )` : 'false';
+  const queryOptions = {
+    elseClause: 'false', values: [actionID('select'), table, requester]
+  };
+  if (memberColName) {
+    queryOptions.elseClause = `(
+      SELECT COUNT(power.id) > 0
+      FROM power, badge, ${table}
+      WHERE power.action = $1
+      AND power.object = $2
+      AND power.property IS NULL
+      AND power.role IS NULL
+      AND ${table}.${memberColName} = $3
+      AND ${table}.id = $4
+    )`;
+    queryOptions.values.push(id);
+  }
   const pq = new PQ(
     `
       SELECT
@@ -72,15 +78,15 @@ const select1Row = (requester, table, id) => {
           AND power.object = $2
           AND power.property IS NULL
           AND badge.role = power.role
-          AND badge.member = $4
+          AND badge.member = $3
         ) THEN
           true
         ELSE
-          ${elseClause}
+          ${queryOptions.elseClause}
         END
       AS has_power
     `,
-    [actionID('select'), table, id, requester]
+    queryOptions.values
   );
   return db.one(pq);
 };
@@ -153,37 +159,46 @@ const insertRows = (requester, table, specs) => {
 */
 const delete1Row = (requester, table, id) => {
   const memberColName = memberCol(table);
-  const elseClause = memberColName ? `(
-    SELECT COUNT(power.id) > 0
-    FROM power, badge
-    WHERE power.action = $1
-    AND power.object = $2
-    AND power.property IS NULL
-    AND power.role IS NULL
-    AND (
-      SELECT COUNT(id) > 0
-      FROM ${table}
-      WHERE id = $4
-      AND ${table}.${memberColName} = $3
-    )
-  )` : 'false';
-  const pq = new PQ(`
-    SELECT
-      CASE WHEN (
-        SELECT COUNT(power.id) > 0
-        FROM power, badge
-        WHERE power.action = $1
-        AND power.object = $2
-        AND power.property IS NULL
-        AND badge.role = power.role
-        AND badge.member = $3
-      ) THEN
-        true
-      ELSE
-        ${elseClause}
-      END
-    AS has_power
-  `, [actionID('delete'), table, requester, id]);
+  const queryOptions = {
+    elseClause: 'false', values: [actionID('delete'), table, requester]
+  };
+  if (memberColName) {
+    queryOptions.elseClause = `(
+      SELECT COUNT(power.id) > 0
+      FROM power, badge
+      WHERE power.action = $1
+      AND power.object = $2
+      AND power.property IS NULL
+      AND power.role IS NULL
+      AND (
+        SELECT COUNT(id) > 0
+        FROM ${table}
+        WHERE ${table}.${memberColName} = $3
+        AND id = $4
+      )
+    )`;
+    queryOptions.values.push(id);
+  }
+  const pq = new PQ(
+    `
+      SELECT
+        CASE WHEN (
+          SELECT COUNT(power.id) > 0
+          FROM power, badge
+          WHERE power.action = $1
+          AND power.object = $2
+          AND power.property IS NULL
+          AND badge.role = power.role
+          AND badge.member = $3
+        ) THEN
+          true
+        ELSE
+          ${queryOptions.elseClause}
+        END
+      AS has_power
+    `,
+    queryOptions.values
+  );
   return db.one(pq);
 };
 
@@ -194,43 +209,52 @@ const delete1Row = (requester, table, id) => {
 */
 const update1Value = (requester, table, id, col) => {
   const memberColName = memberCol(table);
-  const elseClause = memberColName ? `(
-    SELECT COUNT(power.id) > 0
-    FROM power, badge
-    WHERE power.action = $1
-    AND power.object = $2
-    AND (
-      power.property = $4
-      OR power.property IS NULL
-    )
-    AND power.role IS NULL
-    AND (
-      SELECT COUNT(id) > 0
-      FROM ${table}
-      WHERE id = $3
-      AND ${table}.${memberColName} = $5
-    )
-  )` : 'false';
-  const pq = new PQ(`
-    SELECT
-      CASE WHEN (
-        SELECT COUNT(power.id) > 0
-        FROM power, badge
-        WHERE power.action = $1
-        AND power.object = $2
-        AND (
-          power.property = $4
-          OR power.property IS NULL
-        )
-        AND badge.role = power.role
-        AND badge.member = $5
-      ) THEN
-        true
-      ELSE
-        ${elseClause}
-      END
-    AS has_power
-  `, [actionID('update'), table, id, col, requester]);
+  const queryOptions = {
+    elseClause: 'false', values: [actionID('update'), table, col, requester]
+  };
+  if (memberColName) {
+    queryOptions.elseClause = `(
+      SELECT COUNT(power.id) > 0
+      FROM power, badge
+      WHERE power.action = $1
+      AND power.object = $2
+      AND (
+        power.property = $3
+        OR power.property IS NULL
+      )
+      AND power.role IS NULL
+      AND (
+        SELECT COUNT(id) > 0
+        FROM ${table}
+        WHERE ${table}.${memberColName} = $4
+        AND id = $5
+      )
+    )`;
+    queryOptions.values.push(id);
+  }
+  const pq = new PQ(
+    `
+      SELECT
+        CASE WHEN (
+          SELECT COUNT(power.id) > 0
+          FROM power, badge
+          WHERE power.action = $1
+          AND power.object = $2
+          AND (
+            power.property = $3
+            OR power.property IS NULL
+          )
+          AND badge.role = power.role
+          AND badge.member = $4
+        ) THEN
+          true
+        ELSE
+          ${queryOptions.elseClause}
+        END
+      AS has_power
+    `,
+    queryOptions.values
+  );
   return db.one(pq);
 };
 

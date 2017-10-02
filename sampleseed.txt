@@ -134,4 +134,9 @@ curl http://localhost:3000/6/report -d '{"offer": 2, "member": 6, "rating": 2, "
 curl http://localhost:3000/2/power -d '{"action": 4, "object": "domain", "role": 1}'
 curl http://localhost:3000/2/power -d '{"action": 4, "object": "domain", "role": 2}'
 curl http://localhost:3000/2/power -d '{"action": 4, "object": "domain", "role": 3}'
+curl http://localhost:3000/2/power -d '{"action": 4, "object": "claim", "role": 1}'
+curl http://localhost:3000/2/power -d '{"action": 4, "object": "claim", "role": 2}'
+curl http://localhost:3000/2/power -d '{"action": 4, "object": "claim", "role": 3}'
 curl http://localhost:3000/8/domain
+curl http://localhost:3000/8/domain/3
+curl http://localhost:3000/8/claim/skill
