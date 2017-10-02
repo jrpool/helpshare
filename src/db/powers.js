@@ -7,7 +7,7 @@ const actionID = actionName => {
     insert: 1,
     delete: 2,
     update: 3,
-    read: 4
+    select: 4
   };
   return actionIDs[actionName];
 };
@@ -65,7 +65,7 @@ const select1Row = (requester, table, id) => {
   const pq = new PQ(
     `
       SELECT
-        CASE WHEN
+        CASE WHEN (
           SELECT COUNT(power.id) > 0
           FROM power, badge
           WHERE power.action = $1
@@ -73,7 +73,7 @@ const select1Row = (requester, table, id) => {
           AND power.property IS NULL
           AND badge.role = power.role
           AND badge.member = $4
-        THEN
+        ) THEN
           true
         ELSE
           ${elseClause}
@@ -144,7 +144,6 @@ const insertRows = (requester, table, specs) => {
     `,
     [actionID('insert'), table, requester]
   );
-  console.log('The insert-power PQ is:\n' + pq);
   return db.one(pq);
 };
 
@@ -154,7 +153,7 @@ const insertRows = (requester, table, specs) => {
 */
 const delete1Row = (requester, table, id) => {
   const memberColName = memberCol(table);
-  const elseClause = memberColName ? `
+  const elseClause = memberColName ? `(
     SELECT COUNT(power.id) > 0
     FROM power, badge
     WHERE power.action = $1
@@ -167,10 +166,10 @@ const delete1Row = (requester, table, id) => {
       WHERE id = $4
       AND ${table}.${memberColName} = $3
     )
-  ` : 'false';
+  )` : 'false';
   const pq = new PQ(`
     SELECT
-      CASE WHEN
+      CASE WHEN (
         SELECT COUNT(power.id) > 0
         FROM power, badge
         WHERE power.action = $1
@@ -178,7 +177,7 @@ const delete1Row = (requester, table, id) => {
         AND power.property IS NULL
         AND badge.role = power.role
         AND badge.member = $3
-      THEN
+      ) THEN
         true
       ELSE
         ${elseClause}
@@ -193,9 +192,9 @@ const delete1Row = (requester, table, id) => {
   or column-specific power to update a column of a row of a table, as a
   promise’s resolution value.
 */
-const update1Value = (requester, table, id, col, value) => {
+const update1Value = (requester, table, id, col) => {
   const memberColName = memberCol(table);
-  const elseClause = memberColName ? `
+  const elseClause = memberColName ? `(
     SELECT COUNT(power.id) > 0
     FROM power, badge
     WHERE power.action = $1
@@ -209,12 +208,12 @@ const update1Value = (requester, table, id, col, value) => {
       SELECT COUNT(id) > 0
       FROM ${table}
       WHERE id = $3
-      AND ${table}.${memberColName} = $6
+      AND ${table}.${memberColName} = $5
     )
-  ` : 'false';
+  )` : 'false';
   const pq = new PQ(`
     SELECT
-      CASE WHEN
+      CASE WHEN (
         SELECT COUNT(power.id) > 0
         FROM power, badge
         WHERE power.action = $1
@@ -224,14 +223,14 @@ const update1Value = (requester, table, id, col, value) => {
           OR power.property IS NULL
         )
         AND badge.role = power.role
-        AND badge.member = $3
-      THEN
+        AND badge.member = $5
+      ) THEN
         true
       ELSE
         ${elseClause}
       END
     AS has_power
-  `, [actionID('update'), table, id, col, value, requester]);
+  `, [actionID('update'), table, id, col, requester]);
   return db.one(pq);
 };
 

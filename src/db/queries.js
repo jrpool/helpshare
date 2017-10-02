@@ -6,7 +6,7 @@ const PQ = require('pg-promise').ParameterizedQuery;
   Define a function that returns a ParameterizedQuery object that will select
   all rows from a table and return an array of row objects.
 */
-const getSelectAllQuery = (table) => new PQ(`SELECT * FROM ${table}`);
+const getSelectAllQuery = table => `SELECT * FROM ${table}`;
 
 /*
   Define a function that returns a ParameterizedQuery object that will select
@@ -21,9 +21,7 @@ const getSelect1RowQuery = (table, id) => new PQ(
   the ID column and 1 other column from a table and return an array of row
   objects.
 */
-const getSelect1ColQuery = (table, col) => new PQ(
-  `SELECT id, ${col} FROM ${table}`
-);
+const getSelect1ColQuery = (table, col) => `SELECT id, ${col} FROM ${table}`;
 
 /*
   Define a function that returns a ParameterizedQuery object that will insert a
@@ -64,7 +62,7 @@ const getUpdate1ValueQuery = (table, id, col, value) => {
   Define a function that submits a query designed to return 1 row and returns
   the row as a promise’s resolution value.
 */
-const submit1 = (requester, query) => {
+const submit1 = query => {
   return db.one(query)
   .catch(error => {
     return error;
@@ -92,11 +90,12 @@ const submit1AndLog = (requester, query) => {
   Define a function that submits a query designed to return a set of rows and
   returns an array of the rows as a promise’s resolution value.
 */
-const submitAll = (requester, query) => {
-  return db.oneOrMany(query)
-  .catch(error => {
-    return error;
-  });
+const submitAll = query => {
+  return db.manyOrNone(query)
+  .then(resultRows => {
+    return resultRows;
+  })
+  .catch(error => error);
 };
 
 /*
@@ -105,15 +104,13 @@ const submitAll = (requester, query) => {
 */
 const submitAllAndLog = (requester, query) => {
   return db.task(context => {
-    return context.oneOrMany(query)
+    return context.manyOrNone(query)
     .then(resultRows => {
       return context.none(log.getQuery(requester, query))
       .then(() => resultRows);
     });
   })
-  .catch(error => {
-    return error;
-  });
+  .catch(error => error);
 };
 
 module.exports = {

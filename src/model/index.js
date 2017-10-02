@@ -6,7 +6,7 @@ const readAll = (requester, object) => {
   return dbPowers.selectAll(requester, object)
   .then(resultRow => {
     if (resultRow.has_power) {
-      return dbQueries.submitAll(requester, dbQueries.getSelectAllQuery(object));
+      return dbQueries.submitAll(dbQueries.getSelectAllQuery(object));
     }
     else {
       return false;
@@ -22,9 +22,7 @@ const read1Record = (requester, object, id) => {
   return dbPowers.select1Row(requester, object, id)
   .then(resultRow => {
     if (resultRow.has_power) {
-      return dbQueries.submit1(
-        requester, dbQueries.getSelect1RowQuery(object, id)
-      );
+      return dbQueries.submit1(dbQueries.getSelect1RowQuery(object, id));
     }
     else {
       return false;
@@ -41,7 +39,7 @@ const read1Property = (requester, object, property) => {
   .then(resultRow => {
     if (resultRow.has_power) {
       return dbQueries.submitAll(
-        requester, dbQueries.getSelect1ColQuery(object, property)
+        dbQueries.getSelect1ColQuery(object, property)
       );
     }
     else {
@@ -57,9 +55,8 @@ const read1Property = (requester, object, property) => {
 const create1Record = (requester, object, specs) => {
   return dbPowers.insertRows(requester, object, specs)
   .then(resultRow => {
-    console.log('Insert power result is ' + JSON.stringify(resultRow));
     if (resultRow.has_power) {
-      return dbQueries.submit1(
+      return dbQueries.submit1AndLog(
         requester, dbQueries.getInsert1RowQuery(object, specs)
       );
       // .then(resultRow => resultRow)
@@ -77,7 +74,7 @@ const delete1Record = (requester, object, id) => {
   return dbPowers.delete1Row(requester, object, id)
   .then(resultRow => {
     if (resultRow.has_power) {
-      return dbQueries.submit1(
+      return dbQueries.submit1AndLog(
         requester, dbQueries.getDelete1RowQuery(object, id)
       );
     }
@@ -92,10 +89,10 @@ const delete1Record = (requester, object, id) => {
 
 // Define a function that updates a property of a record and logs the update.
 const update1Value = (requester, object, id, property, value) => {
-  return dbPowers.update1Value(requester, object, id, property, value)
+  return dbPowers.update1Value(requester, object, id, property)
   .then(resultRow => {
     if (resultRow.has_power) {
-      return dbQueries.submit1(
+      return dbQueries.submit1AndLog(
         requester, dbQueries.getUpdate1ValueQuery(object, id, property, value)
       );
     }

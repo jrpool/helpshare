@@ -18,7 +18,7 @@ router.get(
     controllers.read1Record(
       Number.parseInt(request.params.requester),
       request.params.object,
-      request.params.id,
+      Number.parseInt(request.params.id),
       response
     );
   }
@@ -54,7 +54,7 @@ router.put(
     controllers.update1Value(
       Number.parseInt(request.params.requester),
       request.params.object,
-      request.params.id,
+      Number.parseInt(request.params.id),
       request.params.property,
       request.body.value,
       response
@@ -68,7 +68,7 @@ router.delete(
     controllers.delete1Record(
       Number.parseInt(request.params.requester),
       request.params.object,
-      request.params.id,
+      Number.parseInt(request.params.id),
       response
     );
   }
